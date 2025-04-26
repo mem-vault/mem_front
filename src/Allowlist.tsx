@@ -249,7 +249,7 @@ export function Allowlist({ setRecipientAllowlist, setCapId }: AllowlistProps) {
               </TextField.Slot>
             </TextField.Root>
             <Button
-              variant="solid" // 实心按钮更醒目
+              variant="solid" // 实心按钮更醒
               color="teal"
               size="3" // Match TextField size
               onClick={() => {
