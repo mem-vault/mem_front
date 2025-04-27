@@ -1,4 +1,4 @@
-# Mem Front
+# Memory Vault
 
 这是一个基于 React 和 Vite 构建的前端项目，用于与 Walrus 测试网络进行交互。
 
@@ -41,6 +41,7 @@ pnpm run dev
 项目支持与以下测试网络节点交互：
 
 ### 聚合器节点
+
 - aggregator.walrus-testnet.walrus.space
 - wal-aggregator-testnet.staketab.org
 - walrus-testnet-aggregator.redundex.com
@@ -49,6 +50,7 @@ pnpm run dev
 - walrus-testnet-aggregator.everstake.one
 
 ### 发布者节点
+
 - publisher.walrus-testnet.walrus.space
 - wal-publisher-testnet.staketab.org
 - walrus-testnet-publisher.redundex.com
@@ -75,18 +77,18 @@ pnpm run build
 
 ```bash
 # 运行 ESLint 检查
-npm run lint
+pnpm run lint
 
 # 运行 Prettier 检查
-npm run prettier:check
+pnpm run prettier:check
 
 # 自动修复 ESLint 问题
-npm run lint:fix
+pnpm run lint:fix
 
 # 自动修复 Prettier 问题
-npm run prettier:fix
+pnpm run prettier:fix
 ```
 
 ## 许可证
 
-Apache-2.0 
+Apache-2.0
