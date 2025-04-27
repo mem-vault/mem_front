@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
+    port: 5174,
     proxy: {
       '/aggregator1/v1': {
         target: 'https://aggregator.walrus-testnet.walrus.space',

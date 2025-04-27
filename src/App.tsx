@@ -156,7 +156,7 @@ function App() {
           }}
         >
           <Heading as="h1" size="8" style={{ color: '#003f5c', fontWeight: 'bold' }}>
-            BrainDance
+            Memory Vault
           </Heading>
           <Box>
             <ConnectButton />
