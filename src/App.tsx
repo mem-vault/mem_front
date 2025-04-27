@@ -136,6 +136,7 @@ function App() {
   const currentAccount = useCurrentAccount();
   const [recipientAllowlist, setRecipientAllowlist] = useState<string>('');
   const [capId, setCapId] = useState<string>('');
+  const [showCreateService, setShowCreateService] = useState(false);
 
   return (
     <Router>
@@ -158,13 +159,56 @@ function App() {
           <Heading as="h1" size="8" style={{ color: '#003f5c', fontWeight: 'bold' }}>
             BrainDance
           </Heading>
-          <Box>
-            <ConnectButton />
-          </Box>
+          <Flex gap="4" align="center">
+            <Link to="#guide" style={{ textDecoration: 'none' }}>
+              <Text size="3" weight="medium" style={{ color: '#006064' }}>平台指南</Text>
+            </Link>
+            <Box>
+              <ConnectButton />
+            </Box>
+          </Flex>
         </Flex>
 
         <Box p={{ initial: '4', md: '5' }}>
-          <Card style={{ marginBottom: '3rem', background: 'rgba(230, 249, 253, 0.8)', borderRadius: '16px', backdropFilter: 'blur(8px)', border: '1px solid rgba(173, 232, 244, 0.7)', boxShadow: '0 6px 24px rgba(173, 232, 244, 0.2)' }}>
+          {/* 第一屏：启航您的创作空间或创建会员层级 */}
+          {!showCreateService ? (
+            <Grid columns="1" gap="5" style={{ maxWidth: '600px', margin: '4rem auto 2rem auto' }}>
+              <Card style={{ background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(10px)', borderRadius: '16px', boxShadow: '0 8px 32px rgba(144, 224, 239, 0.3)' }}>
+                <Flex direction="column" gap="4" align="center" style={{ padding: '2.5rem 1.5rem' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <Heading as="h2" size="8" style={{ color: '#023e8a', marginBottom: '1.2rem', fontWeight: 'bold' }}>
+                      启航您的创作空间
+                    </Heading>
+                    <Text as="p" color="gray" size="4" style={{ maxWidth: '480px', lineHeight: '1.7', color: '#005f73' }}>
+                      为您的忠实粉丝打造专属内容与独特体验。轻松设定会员计划，分享您的心血之作，与核心支持者建立深厚连接。
+                    </Text>
+                  </div>
+                  <Button 
+                    size="4" 
+                    radius="full" 
+                    onClick={() => setShowCreateService(true)}
+                    style={{ background: 'linear-gradient(to right, #0077b6, #00b4d8)', color: 'white', padding: '1rem 2.5rem', fontWeight: '600', boxShadow: '0 4px 15px rgba(0, 119, 182, 0.3)' }}
+                  >
+                    创建我的主页
+                  </Button>
+                </Flex>
+              </Card>
+            </Grid>
+          ) : (
+            <CreateService onBack={() => setShowCreateService(false)} />
+          )}
+          
+          {/* 波浪分隔线 */}
+          <WaveSeparator />
+          
+          {/* 第二屏：发现宝藏创作者 */}
+          <ScrollingCreators />
+          
+          {/* 波浪分隔线 */}
+          <WaveSeparator />
+          
+          {/* 第三屏：平台指南 */}
+          <Card id="guide" style={{ marginBottom: '3rem', background: 'rgba(230, 249, 253, 0.8)', borderRadius: '16px', backdropFilter: 'blur(8px)', border: '1px solid rgba(173, 232, 244, 0.7)', boxShadow: '0 6px 24px rgba(173, 232, 244, 0.2)' }}>
             <Box p="5">
               <Heading as="h3" size="6" mb="4" style={{ color: '#01579b', fontWeight: 'bold' }}>
                 平台指南
@@ -176,7 +220,7 @@ function App() {
                     1. **连接钱包:** 使用您的 Sui Testnet 钱包安全连接。
                   </Text>
                   <Text as="p" size="3" color="gray" mb="2" style={{ lineHeight: '1.7', color: '#005f73' }}>
-                    2. **创建主页:** 点击“创建我的主页”，设定您的会员服务详情。
+                    2. **创建主页:** 点击"创建我的主页"，设定您的会员服务详情。
                   </Text>
                   <Text as="p" size="3" color="gray" mb="2" style={{ lineHeight: '1.7', color: '#005f73' }}>
                     3. **管理内容:** 获取您的 `Policy Object ID` 和 `Admin Cap ID`，用于管理会员和发布内容。
@@ -200,88 +244,6 @@ function App() {
               </Grid>
             </Box>
           </Card>
-
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route
-              path="/allowlist-example/*"
-              element={
-                <Routes>
-                  <Route path="/" element={<CreateAllowlist />} />
-                  <Route
-                    path="/admin/allowlist/:id"
-                    element={
-                      <Box>
-                        <Allowlist
-                          setRecipientAllowlist={setRecipientAllowlist}
-                          setCapId={setCapId}
-                        />
-                        <WaveSeparator />
-                        <WalrusUpload
-                          policyObject={recipientAllowlist}
-                          cap_id={capId}
-                          moduleName="allowlist"
-                        />
-                      </Box>
-                    }
-                  />
-                  <Route path="/admin/allowlists" element={<AllAllowlist />} />
-                  <Route
-                    path="/view/allowlist/:id"
-                    element={<Feeds suiAddress={currentAccount?.address || ''} />}
-                  />
-                </Routes>
-              }
-            />
-            <Route
-              path="/subscription-example/*"
-              element={
-                <Routes>
-                  <Route path="/" element={<CreateService />} />
-                  <Route
-                    path="/admin/service/:id"
-                    element={
-                      <Box>
-                        <Service
-                          setRecipientAllowlist={setRecipientAllowlist}
-                          setCapId={setCapId}
-                        />
-                        <WaveSeparator />
-                        <WalrusUpload
-                          policyObject={recipientAllowlist}
-                          cap_id={capId}
-                          moduleName="subscription"
-                        />
-                      </Box>
-                    }
-                  />
-                  <Route path="/admin/services" element={<AllServices />} />
-                  <Route
-                    path="/view/service/:id"
-                    element={<FeedsToSubscribe suiAddress={currentAccount?.address || ''} />}
-                  />
-                  <Route
-                    path="/service/:id"
-                    element={
-                      <Box p="4">
-                        <Service
-                          setRecipientAllowlist={setRecipientAllowlist}
-                          setCapId={setCapId}
-                        />
-                        <WalrusUpload
-                          policyObject={recipientAllowlist}
-                          cap_id={capId}
-                          moduleName="subscription"
-                        />
-                      </Box>
-                    }
-                  />
-                </Routes>
-              }
-            />
-          </Routes>
-
-          {currentAccount && <ScrollingCreators />}
         </Box>
       </Container>
     </Router>

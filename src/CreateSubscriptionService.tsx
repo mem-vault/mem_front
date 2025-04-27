@@ -2,14 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Transaction } from '@mysten/sui/transactions';
-import { Button, Card, Flex, Text, TextField } from '@radix-ui/themes';
+import { Button, Card, Flex, Text, TextField, Heading } from '@radix-ui/themes';
 import { useSignAndExecuteTransaction, useSuiClient } from '@mysten/dapp-kit';
 import { useState } from 'react';
 import { useNetworkVariable } from './networkConfig';
 import { useNavigate } from 'react-router-dom';
-import { InfoCircledIcon, PlusIcon } from '@radix-ui/react-icons';
+import { InfoCircledIcon, PlusIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
 
-export function CreateService() {
+interface CreateServiceProps {
+  onBack: () => void;
+}
+
+export function CreateService({ onBack }: CreateServiceProps) {
   const [price, setPrice] = useState('');
   const [ttl, setTtl] = useState('');
   const [name, setName] = useState('');
@@ -76,43 +80,19 @@ export function CreateService() {
   const waterRippleBackground = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' width='100' height='50'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0 50 Q 25 25 50 50 T 100 50 V 0 H 0 Z'/%3E%3Cpath fill='%23ffffff' fill-opacity='0.05' d='M0 40 Q 25 15 50 40 T 100 40 V 0 H 0 Z'/%3E%3C/svg%3E")`;
 
   return (
-    <Card
-      style={{
-        maxWidth: '500px',
-        margin: '3rem auto',
-        background: 'linear-gradient(140deg, #a0e7e5 0%, #80deea 60%, #4dd0e1 100%)',
-        borderRadius: '16px',
-        boxShadow: '0 8px 25px rgba(77, 208, 225, 0.35)',
-        padding: '2.5rem',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: waterRippleBackground,
-        backgroundRepeat: 'repeat-x',
-        backgroundPosition: 'bottom',
-        opacity: 0.8,
-        zIndex: 0,
-        pointerEvents: 'none',
-      }}></div>
-
-      <Flex direction="column" gap="5" justify="start" style={{ position: 'relative', zIndex: 1 }}>
-        <h2 style={{
-          textAlign: 'center',
-          marginBottom: '2rem',
-          color: '#004d40',
-          fontWeight: 'bold',
-          fontSize: '1.8rem',
-          letterSpacing: '0.5px',
-        }}>
-          创建新的会员层级
-        </h2>
+    <Card style={{
+      maxWidth: '650px',
+      width: '90%',
+      margin: '4rem auto 2rem auto',
+      background: 'rgba(255, 255, 255, 0.85)',
+      backdropFilter: 'blur(10px)',
+      borderRadius: '20px',
+      boxShadow: '0 8px 30px rgba(0, 121, 107, 0.15)',
+      border: '1px solid rgba(173, 232, 244, 0.7)',
+      overflow: 'hidden',
+    }}>
+      <Flex direction="column" gap="4" p="4">
+        <Heading size="5" style={{ color: '#004d40', textAlign: 'center' }}>创建新的会员层级</Heading>
 
         <label>
           <Text as="div" size="3" weight="medium" mb="1" color="teal" style={{ color: '#006064' }}>
@@ -252,6 +232,23 @@ export function CreateService() {
             }}
           >
             查看您发布的所有空间
+          </Button>
+        </Flex>
+
+        <Flex justify="end" mt="4">
+          <Button
+            size="2"
+            variant="ghost"
+            onClick={onBack}
+            style={{
+              color: '#006064',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <ArrowLeftIcon width={16} height={16} /> 返回
           </Button>
         </Flex>
       </Flex>
