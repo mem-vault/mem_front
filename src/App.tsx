@@ -10,7 +10,7 @@ import WalrusUpload from './EncryptAndUpload';
 import { useState } from 'react';
 import { CreateService } from './CreateSubscriptionService';
 import FeedsToSubscribe from './SubscriptionView';
-import { Service } from './SubscriptionService';
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -163,8 +163,20 @@ function App() {
         }}
       >
         <Heading as="h1" size="8" style={{ color: '#ade8f4', fontWeight: 'bold' }}>
-          BrainDance
+          Memory Orb
         </Heading>
+        <Flex gap="4" align="center">
+        {currentAccount && (
+              <Link to="/myspaces">
+                <Button className="water-button-soft">My Spaces</Button>
+              </Link>
+        )}
+        {currentAccount && (
+              <Link to="/mysubscriptions">
+                <Button className="water-button-soft">My Subscriptions</Button>
+              </Link>
+        )}
+        </Flex>
         <Box>
           <ConnectButton />
         </Box>

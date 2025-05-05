@@ -74,7 +74,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
   }
 
   const handleViewAll = () => {
-    navigate(`/subscription-example/admin/services`);
+    navigate(`/myspaces`);
   };
 
   const waterRippleBackground = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' width='100' height='50'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0 50 Q 25 25 50 50 T 100 50 V 0 H 0 Z'/%3E%3Cpath fill='%23ffffff' fill-opacity='0.05' d='M0 40 Q 25 15 50 40 T 100 40 V 0 H 0 Z'/%3E%3C/svg%3E")`;
