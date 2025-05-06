@@ -10,21 +10,17 @@ import WalrusUpload from './EncryptAndUpload';
 import { useState } from 'react';
 import { CreateService } from './CreateSubscriptionService';
 import FeedsToSubscribe from './SubscriptionView';
-
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useParams,
-  useNavigate,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
 import { AllAllowlist } from './OwnedAllowlists';
 import { AllServices } from './OwnedSubscriptionServices';
 import Feeds from './AllowlistView';
 import './App.css'; // 确保 App.css 包含 scrolling-wrapper 和 scrolling-content 的动画
 import StarBackground from './components/StarBackground';
 import Chatbot from './components/Chatbot';
+import { OwnedSpaces } from './OwnedSpaces';
+import SubscribedSpaces from './SubscribedSpaces';
+import SpaceInfo from './SpaceInfo';
+import { ManageSpace } from './ManageSpace';
 
 // --- 增强的水波纹背景 ---
 const SubtleWaterBackground = () => (
@@ -134,8 +130,8 @@ const ScrollingCreators = () => {
   );
 };
 
-// --- 主应用组件 ---
-function App() {
+// --- 主页面内容组件 ---
+function HomePage() {
   const currentAccount = useCurrentAccount();
   const [recipientAllowlist, setRecipientAllowlist] = useState<string>('');
   const [capId, setCapId] = useState<string>('');
@@ -166,16 +162,16 @@ function App() {
           Memory Orb
         </Heading>
         <Flex gap="4" align="center">
-        {currentAccount && (
-              <Link to="/myspaces">
-                <Button className="water-button-soft">My Spaces</Button>
-              </Link>
-        )}
-        {currentAccount && (
-              <Link to="/mysubscriptions">
-                <Button className="water-button-soft">My Subscriptions</Button>
-              </Link>
-        )}
+          {currentAccount && (
+            <Link to="/myspaces">
+              <Button className="water-button-soft">My Spaces</Button>
+            </Link>
+          )}
+          {currentAccount && (
+            <Link to="/mysubscriptions">
+              <Button className="water-button-soft">My Subscriptions</Button>
+            </Link>
+          )}
         </Flex>
         <Box>
           <ConnectButton />
@@ -306,7 +302,7 @@ function App() {
                     探索别人的空间
                   </Heading>
                   <Text as="p" color="gray" size="4" style={{ maxWidth: '480px', lineHeight: '1.7', color: '#005f73' }}>
-                    发现志同道合的创作者，探索他们的精彩世界。在这里，您可以找到共鸣，分享感动，与志趣相投的朋友一起成长。
+                    发现志同道合的创作者，探索他们的精彩世界。在这里，您可以找到共鸣，与志趣相投的朋友一起成长。
                   </Text>
                 </div>
                 <Button 
@@ -381,6 +377,41 @@ function App() {
         </Card>
       </Box>
     </Container>
+  );
+}
+
+// --- 主应用组件 ---
+function App() {
+  const currentAccount = useCurrentAccount();
+  const [recipientAllowlist, setRecipientAllowlist] = useState<string>('');
+  const [capId, setCapId] = useState<string>('');
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/chat" element={<Chatbot />} />
+        <Route path="/myspaces" element={<OwnedSpaces />} />
+        <Route path="/mysubscriptions" element={<SubscribedSpaces />} />
+        <Route path="/view/space/:id" element={<SpaceInfo suiAddress={currentAccount?.address} />} />
+        <Route
+          path="/admin/space/:id"
+          element={
+            <Flex direction="column" gap="6">
+              <ManageSpace
+                setRecipientAllowlist={setRecipientAllowlist}
+                setCapId={setCapId}
+              />
+              <WalrusUpload
+                policyObject={recipientAllowlist}
+                cap_id={capId}
+                moduleName="subscription"
+              />
+            </Flex>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

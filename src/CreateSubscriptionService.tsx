@@ -60,7 +60,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
           );
           const createdObjectId = subscriptionObject?.reference?.objectId;
           if (createdObjectId) {
-            navigate(`/subscription-example/admin/service/${createdObjectId}`);
+            navigate(`/admin/space/${createdObjectId}`);
           } else {
             alert('创建失败，无法找到创建的对象 ID。');
           }
