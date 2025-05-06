@@ -14,6 +14,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const chatLoaded = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const currentAccount = useCurrentAccount();
@@ -21,6 +22,21 @@ const Chatbot = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    if (chatLoaded.current) return;
+    chatLoaded.current = true;
+    const chatData = localStorage.getItem('CHAT_DATA');
+    if (chatData) {
+      const parsedChatData = JSON.parse(chatData) as { messages: { role: "user" | "assistant"; content: string }[] };
+      setMessages(parsedChatData.messages.map((chat, index) => ({
+        id: index,
+        text: chat.content,
+        isUser: chat.role === 'user',
+        isTyping: false
+      })))
+    }
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
