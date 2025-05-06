@@ -157,7 +157,7 @@ export const OwnedSpaces = () => {
                   <Flex align="center" gap="2">
                     <Text size="2" style={{ color: 'var(--secondary-text-color)' }}>ID:</Text>
                     <RadixLink
-                      href={getObjectExplorerLink(item.id)}
+                      href={`https://testnet.suivision.xyz/object/${item.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       size="2"

@@ -165,7 +165,7 @@ export function ManageSpace({ setRecipientAllowlist, setCapId }: AllowlistProps)
               </Heading>
               {service?.id && (
                 <RadixLink
-                  href={getObjectExplorerLink(service.id)}
+                  href={`https://testnet.suivision.xyz/object/${service.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   size="2"

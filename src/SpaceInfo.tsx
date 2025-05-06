@@ -369,7 +369,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
     );
   }
 
-  const updateDecryptedData = (data: { type: string, data: Uint8Array }[]) => {
+  const updateDecryptedData = (data: { type: string, data: string }[]) => {
     localStorage.setItem(`space_${id}`, JSON.stringify(data));
     const urls = data.map((item) => URL.createObjectURL(new Blob([item.data], { type: item.type })));
     setDecryptedFileUrls(urls);
@@ -386,6 +386,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
       setIsDialogOpen(true);
       const data = JSON.parse(cachedFileList);
       console.log("Cached data:", data);
+      // @ts-ignore
       setDecryptedFileUrls(data.map((item) => URL.createObjectURL(new Blob([item.data], { type: item.type }))));
       setIsLoadingAction(false);
       return;
@@ -484,11 +485,11 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
   const renderTopSection = () => (
     <Box mb="6">
       <Grid columns={{ initial: '1', md: '2' }} gap="6" width="auto">
-        <Card className="water-card" p="5">
+        <Card className="water-card">
           <Flex direction="column" gap="3">
             <Text size="7" weight="bold" style={{ color: 'var(--primary-text-color)' }}>{feed!.name}</Text>
             <RadixLink
-              href={getObjectExplorerLink(feed!.id)}
+              href={`https://testnet.suivision.xyz/object/${feed!.id}`}
               target="_blank"
               rel="noopener noreferrer"
               size="2"
@@ -509,7 +510,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
             <Flex justify="between" align="center">
               <Text size="3" style={{ color: 'var(--secondary-text-color)' }}>Owner:</Text>
               <RadixLink
-                href={getObjectExplorerLink(feed!.owner)}
+                href={`https://testnet.suivision.xyz/object/${feed!.owner}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 size="2"
@@ -521,7 +522,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
             </Flex>
           </Flex>
         </Card>
-        <Card className="water-card" p="5">
+        <Card className="water-card">
           <Flex direction="column" gap="4">
             <Heading size="5" style={{ color: 'var(--primary-text-color)' }}>Connect</Heading>
             <Separator size="4" my="2" style={{ background: 'var(--border-color)' }} />
@@ -547,7 +548,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
   );
 
   const renderFilesSection = () => (
-    <Card className="water-card" p="5" key={feed!.id}>
+    <Card className="water-card" key={feed!.id}>
       <Heading size="5" mb="4" style={{ color: 'var(--primary-text-color)' }}>
         Space Content
       </Heading>
@@ -602,7 +603,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
               }}
               key={reloadKey}
             >
-              <Dialog.Title asChild>
+              <Dialog.Title>
                 <Text size="5" weight="bold" style={{ color: 'var(--primary-text-color)', flexShrink: 0 }}>
                   {error ? "Error" : (decryptedFileUrls.length > 0 ? "Retrieved Files" : "Processing...")}
                 </Text>
@@ -680,7 +681,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
       {/* 主要内容区域 */}
       <Box p={{ initial: '3', sm: '4', md: '6' }} style={{ background: 'var(--deep-ocean-bg)', minHeight: '100vh', marginTop: '80px' }}>
         {feed === undefined && !error ? (
-          <Card className="water-card" p="5">
+          <Card className="water-card">
             <Flex align="center" justify="center" gap="3" minHeight="200px">
               <Spinner size="3" />
               <Text size="4" style={{ color: 'var(--secondary-text-color)' }}>Loading space details...</Text>
@@ -694,7 +695,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
         ) : null}
         <AlertDialog.Root open={!!error && !isDialogOpen} onOpenChange={() => setError(null)}>
           <AlertDialog.Content style={{ background: 'var(--midnight-blue-bg)', borderRadius: 'var(--apple-border-radius)', border: '1px solid var(--border-color)' }}>
-            <AlertDialog.Title asChild>
+            <AlertDialog.Title>
               <Text size="5" weight="bold" style={{ color: 'var(--tomato-11)' }}>Error</Text>
             </AlertDialog.Title>
             <Separator size="4" my="3" style={{ background: 'var(--border-color)' }} />
