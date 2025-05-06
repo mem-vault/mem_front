@@ -369,12 +369,27 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
     );
   }
 
+  const updateDecryptedData = (data: { type: string, data: Uint8Array }[]) => {
+    localStorage.setItem(`space_${id}`, JSON.stringify(data));
+    const urls = data.map((item) => URL.createObjectURL(new Blob([item.data], { type: item.type })));
+    setDecryptedFileUrls(urls);
+  }
+
   const onView = async (
     blobIds: string[],
     serviceId: string,
     fee: number,
     subscriptionId?: string,
   ) => {
+    const cachedFileList = localStorage.getItem(`space_${id}`);
+    if (cachedFileList) {
+      setIsDialogOpen(true);
+      const data = JSON.parse(cachedFileList);
+      console.log("Cached data:", data);
+      setDecryptedFileUrls(data.map((item) => URL.createObjectURL(new Blob([item.data], { type: item.type }))));
+      setIsLoadingAction(false);
+      return;
+    }
     setError(null);
     if (!currentAccount?.address) {
       setError("Please connect your wallet first.");
@@ -407,7 +422,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
           client,
           moveCallConstructor,
           setError,
-          setDecryptedFileUrls,
+          updateDecryptedData,
           setIsDialogOpen,
           setReloadKey,
         );
@@ -438,7 +453,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
                 client,
                 moveCallConstructor,
                 setError,
-                setDecryptedFileUrls,
+                updateDecryptedData,
                 setIsDialogOpen,
                 setReloadKey,
               );
