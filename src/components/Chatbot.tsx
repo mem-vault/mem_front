@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, Card, Container, Flex, Text, TextArea } from '@radix-ui/themes';
 import { useNavigate } from 'react-router-dom';
+import { Message, useChatService } from '../chatService';
+import { ConnectButton } from '@mysten/dapp-kit';
 
 const Chatbot = () => {
-  const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean }>>([]);
+  const { sendMessage } = useChatService();
+  const [messages, setMessages] = useState<Array<Message>>([]);
+  const [chating, setChating] = useState(false);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -16,24 +20,66 @@ const Chatbot = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim()) {
-      setMessages([...messages, { text: input, isUser: true }]);
+      setChating(true);
+      const userMessage: Message = {
+        id: Date.now(),
+        text: input,
+        isUser: true,
+      };
+      setMessages([...messages, userMessage]);
       setInput('');
-      // 模拟AI回复
-      setTimeout(() => {
-        setMessages(prev => [...prev, { 
-          text: '这是一个模拟的AI回复。在实际应用中，这里会连接到真实的AI服务。', 
-          isUser: false 
-        }]);
-      }, 1000);
+      const aiMessageId = Date.now() + 1;
+      const aiMessage: Message = {
+        id: aiMessageId,
+        text: '',
+        isUser: false,
+        isTyping: true
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+
+      await sendMessage(
+        input,
+        messages,
+        true,
+        (chunk) => {
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === aiMessageId
+                ? { ...msg, text: msg.text + chunk }
+                : msg
+            )
+          );
+        },
+        () => {
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === aiMessageId
+                ? { ...msg, isTyping: false }
+                : msg
+            )
+          );
+          setChating(false);
+        },
+        (error) => {
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === aiMessageId
+                ? { ...msg, text: 'Sorry, I am unable to respond to your message. Please try again later.', isTyping: false }
+                : msg
+            )
+          );
+          setChating(false);
+        }
+      )
     }
   };
 
   return (
-    <Container size="3" style={{ 
-      height: '100vh', 
-      display: 'flex', 
+    <Container size="3" style={{
+      height: '100vh',
+      display: 'flex',
       flexDirection: 'column',
       position: 'relative',
     }}>
@@ -65,7 +111,7 @@ const Chatbot = () => {
         <Text size="5" weight="bold" style={{ color: '#ade8f4' }}>
           Memory Orb AI
         </Text>
-        <div style={{ width: '100px' }} />
+        <ConnectButton />
       </Flex>
 
       {/* 聊天区域 */}
@@ -172,6 +218,7 @@ const Chatbot = () => {
               padding: '0 2rem',
               height: '60px',
             }}
+            disabled={chating}
           >
             发送
           </Button>
@@ -181,4 +228,4 @@ const Chatbot = () => {
   );
 };
 
-export default Chatbot; 
+export default Chatbot;
