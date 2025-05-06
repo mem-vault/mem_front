@@ -53,6 +53,7 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
   const [fileType, setFileType] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFile = async () => {
@@ -97,6 +98,11 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
 
   const extension = getFileExtension();
 
+  const handleChatWithJson = () => {
+    localStorage.setItem('CHAT_DATA', JSON.stringify(fileData));
+    navigate('/chat');
+  }
+
   return (
     <Box my="1" p="3" style={{ border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--deep-ocean-bg-secondary)' }}>
       <Flex direction="column" gap="2">
@@ -121,10 +127,11 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
                 asChild
                 style={{ cursor: 'pointer' }}
                 className="water-button-soft"
+                onClick={handleChatWithJson}
               >
-                <a href="https://www.brainsdance.com/" target="_blank" rel="noopener noreferrer">
+                <div>
                   chat with JSON
-                </a>
+                </div>
               </Button>
             )}
           </Flex>
