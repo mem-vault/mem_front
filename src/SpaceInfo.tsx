@@ -442,12 +442,14 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
                 setIsDialogOpen,
                 setReloadKey,
               );
+              setIsLoadingAction(false);
               setCurrentSessionKey(sessionKey);
             },
             onError: (err) => {
               console.error("Personal message signing failed:", err);
               setError("Failed to sign message. Please try again.");
               setIsDialogOpen(false);
+              setIsLoadingAction(false);
             },
           },
         );
