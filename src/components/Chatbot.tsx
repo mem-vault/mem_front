@@ -1,103 +1,133 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, Card, Container, Flex, Text, TextArea } from '@radix-ui/themes';
 import { useNavigate } from 'react-router-dom';
-import { Message, useChatService } from '../chatService';
-import { ConnectButton } from '@mysten/dapp-kit';
+import { useCurrentAccount } from '@mysten/dapp-kit';
+
+const API_BASE_URL = `https://api.brainsdance.com/api`;
+
+interface Message {
+  text: string;
+  isUser: boolean;
+}
 
 const Chatbot = () => {
-  const { sendMessage } = useChatService();
-  const [messages, setMessages] = useState<Array<Message>>([]);
-  const [chating, setChating] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const chatLoaded = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const currentAccount = useCurrentAccount();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    if (chatLoaded.current) return;
-    chatLoaded.current = true;
-    const chatData = localStorage.getItem('CHAT_DATA');
-    if (chatData) {
-      const parsedChatData = JSON.parse(chatData) as { messages: { role: "user" | "assistant"; content: string }[] };
-      setMessages(parsedChatData.messages.map((chat, index) => ({
-        id: index,
-        text: chat.content,
-        isUser: chat.role === 'user',
-        isTyping: false
-      })))
-    }
-  }, []);
-
-  useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   const handleSend = async () => {
-    if (input.trim()) {
-      setChating(true);
-      const userMessage: Message = {
-        id: Date.now(),
-        text: input,
-        isUser: true,
-      };
-      setMessages([...messages, userMessage]);
-      setInput('');
-      const aiMessageId = Date.now() + 1;
-      const aiMessage: Message = {
-        id: aiMessageId,
-        text: '',
-        isUser: false,
-        isTyping: true
-      };
-      setMessages((prev) => [...prev, aiMessage]);
+    if (!input.trim() || isLoading) return;
 
-      await sendMessage(
-        input,
-        messages,
-        true,
-        (chunk) => {
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === aiMessageId
-                ? { ...msg, text: msg.text + chunk }
-                : msg
-            )
-          );
+    const userMessage = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
+    setIsLoading(true);
+
+    try {
+      const userId = currentAccount?.address;
+      const response = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream',
         },
-        () => {
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === aiMessageId
-                ? { ...msg, isTyping: false }
-                : msg
-            )
-          );
-          setChating(false);
-        },
-        (error) => {
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === aiMessageId
-                ? { ...msg, text: 'Sorry, I am unable to respond to your message. Please try again later.', isTyping: false }
-                : msg
-            )
-          );
-          setChating(false);
+        body: JSON.stringify({
+          message: userMessage,
+          history: messages.map(msg => ({
+            role: msg.isUser ? 'user' : 'assistant',
+            content: msg.text
+          })),
+          user_id: userId,
+          model: 'deepseek-chat'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('No reader available');
+      }
+
+      let aiResponse = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = new TextDecoder().decode(value);
+        const lines = chunk.split('\n');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+            
+            try {
+              const parsed = JSON.parse(data);
+              console.log('Received chunk:', parsed);
+              
+              const content = parsed.choices?.[0]?.delta?.content || 
+                            parsed.choices?.[0]?.message?.content ||
+                            parsed.content ||
+                            parsed.text;
+              
+              if (content) {
+                aiResponse += content;
+                console.log('Current AI response:', aiResponse);
+                
+                setMessages(prev => {
+                  const newMessages = [...prev];
+                  const lastMessage = newMessages[newMessages.length - 1];
+                  
+                  if (lastMessage && !lastMessage.isUser) {
+                    return newMessages.map((msg, idx) => 
+                      idx === newMessages.length - 1 
+                        ? { ...msg, text: aiResponse }
+                        : msg
+                    );
+                  } else {
+                    return [...newMessages, { text: aiResponse, isUser: false }];
+                  }
+                });
+              }
+            } catch (e) {
+              console.error('Error parsing chunk:', e, 'Raw data:', data);
+            }
+          }
         }
-      )
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { 
+        text: '抱歉，发生了错误。请稍后重试。', 
+        isUser: false 
+      }]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Container size="3" style={{
-      height: '100vh',
-      display: 'flex',
+    <Container size="3" style={{ 
+      height: '100vh', 
+      display: 'flex', 
       flexDirection: 'column',
       position: 'relative',
+      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
     }}>
       {/* 顶部导航栏 */}
       <Flex
@@ -122,12 +152,12 @@ const Chatbot = () => {
           onClick={() => navigate('/')}
           style={{ color: '#ade8f4' }}
         >
-          Back to Home
+          返回主页
         </Button>
         <Text size="5" weight="bold" style={{ color: '#ade8f4' }}>
           Memory Orb AI
         </Text>
-        <ConnectButton />
+        <div style={{ width: '100px' }} />
       </Flex>
 
       {/* 聊天区域 */}
@@ -138,57 +168,66 @@ const Chatbot = () => {
           padding: '2rem',
           background: 'rgba(26, 26, 46, 0.3)',
           backdropFilter: 'blur(10px)',
-          marginTop: '60px', // 为顶部导航栏留出空间
-          marginBottom: '100px', // 为底部输入框留出空间
+          marginTop: '60px',
+          marginBottom: '100px',
+          height: 'calc(100vh - 160px)',
+          display: 'flex',
+          flexDirection: 'column',
+          border: 'none',
         }}
       >
-        {messages.map((message, index) => (
-          <Flex
-            key={index}
-            justify={message.isUser ? 'end' : 'start'}
-            mb="4"
-          >
-            <Card
-              style={{
-                maxWidth: '70%',
-                background: message.isUser
-                  ? 'linear-gradient(135deg, rgba(173, 232, 244, 0.2), rgba(144, 224, 239, 0.4))'
-                  : 'linear-gradient(135deg, rgba(144, 224, 239, 0.2), rgba(173, 232, 244, 0.4))',
-                border: '1px solid rgba(173, 232, 244, 0.5)',
-                borderRadius: '20px',
-                padding: '1rem',
-                position: 'relative',
-                overflow: 'hidden',
-              }}
+        <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          {messages.map((message, index) => (
+            <Flex
+              key={index}
+              justify={message.isUser ? 'end' : 'start'}
+              mb="4"
             >
-              <div
+              <Card
                 style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'radial-gradient(circle at 50% 50%, rgba(173, 232, 244, 0.1) 0%, rgba(255, 255, 255, 0) 70%)',
-                  pointerEvents: 'none',
-                }}
-              />
-              <Text
-                style={{
-                  color: '#ade8f4',
-                  lineHeight: 1.6,
+                  maxWidth: '70%',
+                  background: message.isUser
+                    ? 'linear-gradient(135deg, rgba(173, 232, 244, 0.2), rgba(144, 224, 239, 0.4))'
+                    : 'linear-gradient(135deg, rgba(144, 224, 239, 0.1), rgba(173, 232, 244, 0.2))',
+                  border: '1px solid rgba(173, 232, 244, 0.5)',
+                  borderRadius: '20px',
+                  padding: '1rem',
                   position: 'relative',
-                  zIndex: 1,
+                  overflow: 'hidden',
                 }}
               >
-                {message.text}
-              </Text>
-            </Card>
-          </Flex>
-        ))}
-        <div ref={messagesEndRef} />
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: message.isUser
+                      ? 'radial-gradient(circle at 50% 50%, rgba(173, 232, 244, 0.1) 0%, rgba(255, 255, 255, 0) 70%)'
+                      : 'radial-gradient(circle at 50% 50%, rgba(144, 224, 239, 0.05) 0%, rgba(255, 255, 255, 0) 70%)',
+                    pointerEvents: 'none',
+                  }}
+                />
+                <Text
+                  style={{
+                    color: '#e0f7fa',
+                    lineHeight: 1.6,
+                    position: 'relative',
+                    zIndex: 1,
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {message.text}
+                </Text>
+              </Card>
+            </Flex>
+          ))}
+          <div ref={messagesEndRef} />
+        </Box>
       </Box>
 
-      {/* 输入区域 - 固定在底部 */}
+      {/* 输入区域 */}
       <Box
         p="4"
         style={{
@@ -207,6 +246,7 @@ const Chatbot = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="输入您的问题..."
+            disabled={isLoading}
             style={{
               flex: 1,
               background: 'rgba(173, 232, 244, 0.1)',
@@ -226,6 +266,7 @@ const Chatbot = () => {
           />
           <Button
             onClick={handleSend}
+            disabled={isLoading}
             style={{
               background: 'linear-gradient(135deg, rgba(173, 232, 244, 0.2), rgba(144, 224, 239, 0.4))',
               color: '#ade8f4',
@@ -233,10 +274,10 @@ const Chatbot = () => {
               borderRadius: '20px',
               padding: '0 2rem',
               height: '60px',
+              opacity: isLoading ? 0.5 : 1,
             }}
-            disabled={chating}
           >
-            发送
+            {isLoading ? '发送中...' : '发送'}
           </Button>
         </Flex>
       </Box>
@@ -244,4 +285,4 @@ const Chatbot = () => {
   );
 };
 
-export default Chatbot;
+export default Chatbot; 
