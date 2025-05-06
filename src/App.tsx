@@ -393,7 +393,9 @@ function App() {
         <Route path="/chat" element={<Chatbot />} />
         <Route path="/myspaces" element={<OwnedSpaces />} />
         <Route path="/mysubscriptions" element={<SubscribedSpaces />} />
-        <Route path="/view/space/:id" element={<SpaceInfo suiAddress={currentAccount?.address} />} />
+        {currentAccount && (
+          <Route path="/view/space/:id" element={<SpaceInfo suiAddress={currentAccount.address} />} />
+        )}
         <Route
           path="/admin/space/:id"
           element={

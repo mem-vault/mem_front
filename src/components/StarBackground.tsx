@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 interface Star {
-  id: number;
+  id: string;
   x: number;
   y: number;
   size: number;
@@ -17,10 +17,10 @@ const StarBackground: React.FC = () => {
   useEffect(() => {
     // 创建初始星星
     const initialStars = Array.from({ length: 100 }, (_, i) => ({
-      id: i,
+      id: `initial-${i}`,
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
-      size: Math.random() * 8 + 4, // 增加星星大小
+      size: Math.random() * 8 + 4,
       opacity: Math.random() * 0.8 + 0.2,
       animationDuration: Math.random() * 3 + 2,
       fadeOut: false,
@@ -33,7 +33,7 @@ const StarBackground: React.FC = () => {
       
       // 在鼠标位置创建新星星
       const newStar: Star = {
-        id: Date.now(),
+        id: `mouse-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         x: e.clientX,
         y: e.clientY,
         size: Math.random() * 8 + 4,

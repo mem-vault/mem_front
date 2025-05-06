@@ -579,9 +579,9 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
               key={reloadKey}
             >
               <Dialog.Title asChild>
-                <Heading size="5" style={{ color: 'var(--primary-text-color)', flexShrink: 0 }}>
+                <Text size="5" weight="bold" style={{ color: 'var(--primary-text-color)', flexShrink: 0 }}>
                   {error ? "Error" : (decryptedFileUrls.length > 0 ? "Retrieved Files" : "Processing...")}
-                </Heading>
+                </Text>
               </Dialog.Title>
               <Separator size="4" my="3" style={{ background: 'var(--border-color)', flexShrink: 0 }} />
               <Box style={{ overflowY: 'auto', flexGrow: 1 }}>
@@ -671,7 +671,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
         <AlertDialog.Root open={!!error && !isDialogOpen} onOpenChange={() => setError(null)}>
           <AlertDialog.Content style={{ background: 'var(--midnight-blue-bg)', borderRadius: 'var(--apple-border-radius)', border: '1px solid var(--border-color)' }}>
             <AlertDialog.Title asChild>
-              <Heading size="5" style={{ color: 'var(--tomato-11)' }}>Error</Heading>
+              <Text size="5" weight="bold" style={{ color: 'var(--tomato-11)' }}>Error</Text>
             </AlertDialog.Title>
             <Separator size="4" my="3" style={{ background: 'var(--border-color)' }} />
             <AlertDialog.Description size="3" style={{ color: 'var(--primary-text-color)' }}>
