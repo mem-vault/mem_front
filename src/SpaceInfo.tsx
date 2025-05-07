@@ -110,7 +110,7 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
           <Text weight="medium" style={{ color: 'var(--primary-text-color)' }}>File {index + 1}</Text>
           <Flex gap="2">
             <Button
-              size="1"
+              size="2"
               variant="soft"
               asChild
               style={{ cursor: 'pointer' }}
@@ -122,15 +122,22 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
             </Button>
             {extension === 'json' && (
               <Button
-                size="1"
-                variant="soft"
+                size="2"
+                variant="solid"
                 asChild
-                style={{ cursor: 'pointer' }}
-                className="water-button-soft"
+                style={{ 
+                  cursor: 'pointer',
+                  background: 'var(--interactive-blue)',
+                  color: 'white',
+                  '&:hover': {
+                    background: 'var(--accent-aqua)'
+                  }
+                }}
+                className="water-button-primary"
                 onClick={handleChatWithJson}
               >
                 <div>
-                  chat with JSON
+                  Chat with Memory
                 </div>
               </Button>
             )}

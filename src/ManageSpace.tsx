@@ -157,9 +157,27 @@ export function ManageSpace({ setRecipientAllowlist, setCapId }: AllowlistProps)
           <Flex direction="column" gap="6" p={{ initial: 'var(--space-5)', sm: 'var(--space-6)' }}> {/* Responsive padding */}
             {/* Header Section */}
             <Flex direction="column" gap="1">
-              <Text size="2" weight="medium" style={{ color: accentAqua, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Space Control Panel
-              </Text>
+              <Flex justify="between" align="center">
+                <Text size="2" weight="medium" style={{ color: accentAqua, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Space Control Panel
+                </Text>
+                <RadixLink href="https://www.brainsdance.com/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                  <Button
+                    size="2"
+                    variant="ghost"
+                    style={{
+                      cursor: 'pointer',
+                      color: primaryText,
+                      fontWeight: 500,
+                      transition: 'color 0.2s ease',
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.color = accentAqua}
+                    onMouseOut={(e) => e.currentTarget.style.color = primaryText}
+                  >
+                    create memory
+                  </Button>
+                </RadixLink>
+              </Flex>
               <Heading as="h2" size={{ initial: '6', sm: '7' }} style={{ color: primaryText, fontWeight: 600 }}>
                 {serviceName}
               </Heading>
@@ -252,26 +270,6 @@ export function ManageSpace({ setRecipientAllowlist, setCapId }: AllowlistProps)
                 );
               })}
             </Grid>
-
-            {/* 新增按钮 */}
-            <Flex justify="center" mt="4"> {/* 添加一些上边距 */}
-              <RadixLink href="https://www.brainsdance.com/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                <Button
-                  size="3"
-                  style={{
-                    cursor: 'pointer',
-                    backgroundColor: interactiveBlue, // 使用主题颜色
-                    color: primaryText, // 使用主题文本颜色
-                    fontWeight: 500,
-                    transition: 'background-color 0.2s ease',
-                  }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = accentAqua} // 悬停效果
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = interactiveBlue} // 恢复原色
-                >
-                  create memory with braindance
-                </Button>
-              </RadixLink>
-            </Flex>
           </Flex>
         </Card>
       </Box>
