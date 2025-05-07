@@ -13,8 +13,9 @@ import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
 import { fromHex, SUI_CLOCK_OBJECT_ID } from '@mysten/sui/utils';
 import { SealClient, SessionKey, getAllowlistedKeyServers } from '@mysten/seal';
 import { useParams, useNavigate } from 'react-router-dom';
-import { downloadAndDecrypt, getObjectExplorerLink, MoveCallConstructor } from './utils';
+import { downloadAndDecrypt, MoveCallConstructor } from './utils';
 import { ExternalLinkIcon, GitHubLogoIcon, TwitterLogoIcon, GlobeIcon, InfoCircledIcon, LockClosedIcon, DownloadIcon } from '@radix-ui/react-icons';
+import { SuiTransactionBlockResponse } from '@mysten/sui/client';
 
 const TTL_MIN = 10;
 export interface FeedData {
@@ -125,13 +126,10 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
                 size="2"
                 variant="solid"
                 asChild
-                style={{ 
+                style={{
                   cursor: 'pointer',
                   background: 'var(--interactive-blue)',
                   color: 'white',
-                  '&:hover': {
-                    background: 'var(--accent-aqua)'
-                  }
                 }}
                 className="water-button-primary"
                 onClick={handleChatWithJson}
@@ -333,47 +331,55 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
   async function handleSubscribe(serviceId: string, fee: number) {
     setIsLoadingAction(true);
     setError(null);
-    const address = currentAccount?.address!;
-    if (!address) {
-      setError("Please connect your wallet first.");
-      setIsLoadingAction(false);
-      return;
-    }
-    const tx = new Transaction();
-    tx.setGasBudget(10000000);
-    tx.setSender(address);
-    const subscription = tx.moveCall({
-      target: `${packageId}::subscription::subscribe`,
-      arguments: [
-        coinWithBalance({
-          balance: BigInt(fee),
-        }),
-        tx.object(serviceId),
-        tx.object(SUI_CLOCK_OBJECT_ID),
-      ],
-    });
-    tx.moveCall({
-      target: `${packageId}::subscription::transfer`,
-      arguments: [tx.object(subscription), tx.pure.address(address)],
-    });
 
-    signAndExecute(
-      {
-        transaction: tx,
-      },
-      {
-        onSuccess: async (result) => {
-          console.log('Subscription successful:', result);
-          await getFeed();
-          setIsLoadingAction(false);
-        },
-        onError: (err) => {
-          console.error("Subscription failed:", err);
-          setError("Subscription transaction failed. Please check console and try again.");
-          setIsLoadingAction(false);
-        },
-      },
-    );
+    try {
+      const address = currentAccount?.address!;
+      if (!address) {
+        throw new Error("Wallet not connected, Please connect your wallet first.");
+      }
+      const tx = new Transaction();
+      tx.setGasBudget(10000000);
+      tx.setSender(address);
+      const subscription = tx.moveCall({
+        target: `${packageId}::subscription::subscribe`,
+        arguments: [
+          coinWithBalance({
+            balance: BigInt(fee),
+          }),
+          tx.object(serviceId),
+          tx.object(SUI_CLOCK_OBJECT_ID),
+        ],
+      });
+      tx.moveCall({
+        target: `${packageId}::subscription::transfer`,
+        arguments: [tx.object(subscription), tx.pure.address(address)],
+      });
+
+      const result = await new Promise<SuiTransactionBlockResponse>((resolve, reject) => {
+        signAndExecute(
+          {
+            transaction: tx,
+          },
+          {
+            onSuccess: async (result) => {
+              resolve(result);
+            },
+            onError: (err) => {
+              reject(err);
+            },
+          },
+        );
+      });
+
+      await getFeed();
+      console.log('Subscription successful:', result);
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Error during subscription:", error);
+      setError(error instanceof Error ? error.message : "An unexpected error occurred during subscription.");
+    } finally {
+      setIsLoadingAction(false);
+    }
   }
 
   const updateDecryptedData = (data: { type: string, data: string }[]) => {
