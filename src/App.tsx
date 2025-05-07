@@ -153,7 +153,7 @@ function HomePage() {
         }}
       >
         <Heading as="h1" size="8" style={{ color: '#ade8f4', fontWeight: 'bold' }}>
-          Memory Orb
+          Memory Vault
         </Heading>
         <Flex gap="4" align="center">
           {currentAccount && (
@@ -207,7 +207,7 @@ function HomePage() {
             onClick={() => navigate('/chat')}
           >
             <span style={{ position: 'relative', zIndex: 1 }}>
-              第一次来到这里？来体验一下 Memory Orb
+              第一次来到这里？来体验一下 Memory Vault
             </span>
             <div style={{
               position: 'absolute',
@@ -222,7 +222,7 @@ function HomePage() {
           </Button>
         </Box>
 
-        {/* 第一屏：启航您的创作空间或创建会员层级 */}
+        {/* 第一屏：启航您的创作空间 */}
         {!showCreateService ? (
           <Grid columns="2" gap="5" style={{ maxWidth: '1200px', margin: '4rem auto 2rem auto' }}>
             {/* 左侧：启航您的创作空间 */}
@@ -351,7 +351,7 @@ function HomePage() {
                   3. **管理内容:** 获取您的 `Policy Object ID` 和 `Admin Cap ID`，用于管理会员和发布内容。
                 </Text>
                 <Text as="p" size="3" color="gray" mb="2" style={{ lineHeight: '1.7', color: '#005f73' }}>
-                  4. **发布加密作品:** 上传仅限会员访问的独家内容（如图文、音视频等 - 当前示例支持图片）。
+                  4. **发布加密作品:** 上传仅限会员访问的独家内容（如图文、音视频等 - 当前示例支持聊天记录）。
                 </Text>
               </Box>
               <Box>
@@ -360,7 +360,7 @@ function HomePage() {
                   1. **连接钱包:** 使用您的 Sui Testnet 钱包轻松加入。
                 </Text>
                 <Text as="p" size="3" color="gray" mb="2" style={{ lineHeight: '1.7', color: '#005f73' }}>
-                  2. **浏览与支持:** 发现您喜爱的创作者，选择合适的会员等级进行订阅。
+                  2. **浏览与支持:** 发现您喜爱的创作者，选择合适的会员空间进行订阅。
                 </Text>
                 <Text as="p" size="3" color="gray" mb="2" style={{ lineHeight: '1.7', color: '#005f73' }}>
                   3. **解锁内容:** 在会员期内，畅享创作者发布的专属内容和福利。

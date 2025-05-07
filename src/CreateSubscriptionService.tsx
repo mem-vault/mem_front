@@ -92,7 +92,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
       overflow: 'hidden',
     }}>
       <Flex direction="column" gap="4" p="4">
-        <Heading size="5" style={{ color: '#004d40', textAlign: 'center' }}>创建新的会员层级</Heading>
+        <Heading size="5" style={{ color: '#004d40', textAlign: 'center' }}>创建新的会员空间</Heading>
 
         <label>
           <Text as="div" size="3" weight="medium" mb="1" color="teal" style={{ color: '#006064' }}>
@@ -115,7 +115,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
 
         <label>
           <Text as="div" size="3" weight="medium" mb="1" color="teal" style={{ color: '#006064' }}>
-            空间代币数量
+            订阅费（MIST）
           </Text>
           <TextField.Root
             type="number"
@@ -135,7 +135,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
 
         <label>
           <Text as="div" size="3" weight="medium" mb="1" color="teal" style={{ color: '#006064' }}>
-            注入SUI数量
+            有效期（分钟）
           </Text>
           <TextField.Root
             type="number"
@@ -157,29 +157,6 @@ export function CreateService({ onBack }: CreateServiceProps) {
           </Text>
         </label>
 
-        <label>
-          <Text as="div" size="3" weight="medium" mb="1" color="teal" style={{ color: '#006064' }}>
-            最大订阅数量
-          </Text>
-          <TextField.Root
-            type="number"
-            placeholder="例如：1000 (留空则无限制)"
-            value={maxSubscribers}
-            onChange={(e) => setMaxSubscribers(e.target.value)}
-            size="3"
-            style={{
-              borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.85)',
-              border: '1px solid #4dd0e1',
-              boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.05)',
-              color: '#333333',
-            }}
-          />
-          <Text as="div" size="2" color="gray" mt="2" style={{ color: '#00796b' }}>
-            <InfoCircledIcon style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-            限制可以订阅此层级的最大用户数。
-          </Text>
-        </label>
 
         <hr style={{ border: 'none', borderTop: '1px solid rgba(0, 105, 92, 0.3)', margin: '1.5rem 0' }} />
 
