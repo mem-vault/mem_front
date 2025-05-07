@@ -22,7 +22,7 @@ export const downloadAndDecrypt = async (
     blobIds.map(async (blobId) => {
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
+        const timeout = setTimeout(() => controller.abort(), 30000);
         const randomAggregator = aggregators[Math.floor(Math.random() * aggregators.length)];
         const aggregatorUrl = `/${randomAggregator}/v1/blobs/${blobId}`;
         const response = await fetch(aggregatorUrl, { signal: controller.signal });
