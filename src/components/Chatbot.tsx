@@ -2,13 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, Card, Container, Flex, Text, TextArea } from '@radix-ui/themes';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentAccount } from '@mysten/dapp-kit';
+import { Message } from '../chatService';
 
 const API_BASE_URL = `https://api.brainsdance.com/api`;
-
-interface Message {
-  text: string;
-  isUser: boolean;
-}
 
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -27,14 +23,28 @@ const Chatbot = () => {
     if (chatLoaded.current) return;
     chatLoaded.current = true;
     const chatData = localStorage.getItem('CHAT_DATA');
+    const startId = Date.now();
     if (chatData) {
       const parsedChatData = JSON.parse(chatData) as { messages: { role: "user" | "assistant"; content: string }[] };
-      setMessages(parsedChatData.messages.map((chat, index) => ({
-        id: index,
+      setMessages(parsedChatData.messages.map((chat, index): Message => ({
+        id: startId + index,
         text: chat.content,
         isUser: chat.role === 'user',
         isTyping: false
       })))
+    } else {
+      setMessages([
+        {
+          id: startId + 0,
+          isUser: true,
+          text: "Please translate into Chinese: hello we are the builders of memory vault, a decentralized AI memory sharing platform. Creators can interact with chatbots and upload these conversations into their own SPACE. Users can subscribe to those spaces, and continue the conversation with a chatbot."
+        },
+        {
+          id: startId + 1,
+          isUser: false,
+          text: "你好，我们是Memory Vault的开发者，这是一个去中心化的AI记忆共享平台。创作者可以与聊天机器人互动，并将这些对话上传到他们专属的SPACE空间中。用户可以订阅这些空间，并继续与聊天机器人展开对话。  \n\n（注：根据技术语境优化了术语翻译——\"SPACE\"保留英文大写强调产品功能模块，\"chatbot\"译为行业通用词\"聊天机器人\"，并采用\"去中心化\"等区块链领域标准译法，确保概念准确性。）"
+        }
+      ]);
     }
   }, []);
 
@@ -47,7 +57,7 @@ const Chatbot = () => {
 
     const userMessage = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
+    setMessages(prev => [...prev, { id: Date.now(), text: userMessage, isUser: true }]);
     setIsLoading(true);
 
     try {
@@ -86,37 +96,37 @@ const Chatbot = () => {
 
         const chunk = new TextDecoder().decode(value);
         const lines = chunk.split('\n');
-        
+
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
             if (data === '[DONE]') continue;
-            
+
             try {
               const parsed = JSON.parse(data);
               console.log('Received chunk:', parsed);
-              
-              const content = parsed.choices?.[0]?.delta?.content || 
-                            parsed.choices?.[0]?.message?.content ||
-                            parsed.content ||
-                            parsed.text;
-              
+
+              const content = parsed.choices?.[0]?.delta?.content ||
+                parsed.choices?.[0]?.message?.content ||
+                parsed.content ||
+                parsed.text;
+
               if (content) {
                 aiResponse += content;
                 console.log('Current AI response:', aiResponse);
-                
+
                 setMessages(prev => {
                   const newMessages = [...prev];
                   const lastMessage = newMessages[newMessages.length - 1];
-                  
+
                   if (lastMessage && !lastMessage.isUser) {
-                    return newMessages.map((msg, idx) => 
-                      idx === newMessages.length - 1 
+                    return newMessages.map((msg, idx) =>
+                      idx === newMessages.length - 1
                         ? { ...msg, text: aiResponse }
                         : msg
                     );
                   } else {
-                    return [...newMessages, { text: aiResponse, isUser: false }];
+                    return [...newMessages, { id: Date.now(), text: aiResponse, isUser: false }];
                   }
                 });
               }
@@ -128,9 +138,10 @@ const Chatbot = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      setMessages(prev => [...prev, { 
-        text: '抱歉，发生了错误。请稍后重试。', 
-        isUser: false 
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        text: '抱歉，发生了错误。请稍后重试。',
+        isUser: false
       }]);
     } finally {
       setIsLoading(false);
@@ -138,9 +149,9 @@ const Chatbot = () => {
   };
 
   return (
-    <Container size="3" style={{ 
-      height: '100vh', 
-      display: 'flex', 
+    <Container size="3" style={{
+      height: '100vh',
+      display: 'flex',
       flexDirection: 'column',
       position: 'relative',
       background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
