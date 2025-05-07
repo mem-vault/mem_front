@@ -71,14 +71,13 @@ function LandingPage() {
 // --- 优化后的滚动创作者列表 ---
 const ScrollingCreators = () => {
   const creators = [
-    { name: '艺术家A', avatar: 'A', id: 'service-id-a' },
-    { name: '音乐家B', avatar: 'B', id: 'service-id-b' },
-    { name: '作家C', avatar: 'C', id: 'service-id-c' },
-    { name: '设计师D', avatar: 'D', id: 'service-id-d' },
-    { name: '摄影师E', avatar: 'E', id: 'service-id-e' },
-    { name: '开发者F', avatar: 'F', id: 'service-id-f' },
-    { name: '播客G', avatar: 'G', id: 'service-id-g' },
-    { name: '教育家H', avatar: 'H', id: 'service-id-h' },
+    { name: '比特币本杰明', avatar: 'A', id: '0x00b2495338f87e9867607be53ab1045183b2debca9ca40ed236090e8ff606544' },
+    { name: '巴菲特', avatar: 'B', id: '0x31c42e36052e6a541be56419b21311e5cdc3e2cb049b316e0462044f585e2961' },
+    { name: '星球大战', avatar: 'C', id: '0xf1547afad2f071031a562cea4844e39e149cbc77654db05c1bbe2438fe576bbc' },
+    { name: 'AI课堂', avatar: 'E', id: '0x1c70f6729d2191f0e2e2b75132403326bc2d50c87e1ce88315e6c81453ccbb9e' },
+    { name: '陀宇宙', avatar: 'F', id: '0xed5e5248ff9631dd089217a7bf8452c24b27763c833676356699322726a8ef6b' },
+    { name: '币圈贤哥', avatar: 'G', id: '0x6e622dde02687c4915c63925125bec803ffd6fa24ae3496bf4aa285f2fd6ae5d' },
+    { name: '邦妮区块链', avatar: 'H', id: '0x2aff9822b593f6bb8f464f5aae6df9964766d7ca17d9bdb061c49d49f0b7d7cf' },
   ];
 
   return (
@@ -89,7 +88,7 @@ const ScrollingCreators = () => {
           {creators.map((creator, index) => (
             <Link
               key={index}
-              to={`/subscription-example/service/${creator.id}`}
+              to={`/view/space/${creator.id}`}
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
               <Flex
