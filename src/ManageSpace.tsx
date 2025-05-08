@@ -161,7 +161,7 @@ export function ManageSpace({ setRecipientAllowlist, setCapId }: AllowlistProps)
                 <Text size="2" weight="medium" style={{ color: accentAqua, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Space Control Panel
                 </Text>
-                <RadixLink href="https://www.brainsdance.com/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                <RadixLink href="/chat" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                   <Button
                     size="2"
                     variant="ghost"
