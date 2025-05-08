@@ -3,6 +3,7 @@ import { Box, Button, Card, Container, Flex, Text, TextArea } from '@radix-ui/th
 import { useNavigate } from 'react-router-dom';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { Message } from '../chatService';
+import { useMemoryService } from '../memoryService';
 
 const API_BASE_URL = `https://api.brainsdance.com/api`;
 
@@ -14,6 +15,10 @@ const Chatbot = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const currentAccount = useCurrentAccount();
+  const uplodaMemoryInput = useRef<HTMLInputElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const { exportMemory } = useMemoryService();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -148,6 +153,42 @@ const Chatbot = () => {
     }
   };
 
+  const handleDownloadMemory = async () => {
+    try {
+      setIsDownloading(true);
+      await exportMemory();
+    } finally {
+      setIsDownloading(false);
+    }
+  }
+
+  const handleUploadMemory = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    setIsUploading(true);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const parsedMessages: { messages: { role: string, content: string }[] } = JSON.parse(content);
+        if (!parsedMessages.messages || !Array.isArray(parsedMessages.messages)) {
+          throw new Error('Invalid file format. Expected an array of messages.');
+        }
+        setMessages(parsedMessages.messages.map((msg, index) => ({
+          id: index,
+          text: msg.content,
+          isUser: msg.role === 'user',
+          isTyping: false,
+        })));
+      } finally {
+        setIsUploading(false);
+      }
+    };
+    reader.readAsText(file);
+  }
+
   return (
     <Container size="3" style={{
       height: '100vh',
@@ -184,7 +225,15 @@ const Chatbot = () => {
         <Text size="5" weight="bold" style={{ color: '#ade8f4' }}>
           Memory Orb AI
         </Text>
-        <div style={{ width: '100px' }} />
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <Button loading={isDownloading} onClick={handleDownloadMemory}>
+            Export Memory
+          </Button>
+          <Button loading={isUploading} onClick={() => uplodaMemoryInput.current?.click()}>
+            <input ref={uplodaMemoryInput} type='file' accept='.json' onChange={handleUploadMemory} hidden />
+            Import Memory
+          </Button>
+        </div>
       </Flex>
 
       {/* 聊天区域 */}
@@ -312,4 +361,4 @@ const Chatbot = () => {
   );
 };
 
-export default Chatbot; 
+export default Chatbot;

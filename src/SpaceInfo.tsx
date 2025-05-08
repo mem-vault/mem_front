@@ -221,6 +221,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
   const currentAccount = useCurrentAccount();
   const [currentSessionKey, setCurrentSessionKey] = useState<SessionKey | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const [hasCache, setHasCache] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoadingAction, setIsLoadingAction] = useState(false);
 
@@ -244,6 +245,18 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
     }, 3000);
     return () => clearInterval(intervalId);
   }, [id, suiAddress, packageId, suiClient]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (localStorage.getItem(`space_${id}`)) {
+        setHasCache(true);
+      } else {
+        setHasCache(false);
+      }
+    }, 100);
+
+    return () => clearInterval(intervalId);
+  }, [id]);
 
   async function getFeed() {
     try {
@@ -581,7 +594,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
               setIsLoadingAction(false);
             }
           }}>
-            <Flex justify="start">
+            <Flex justify="start" gap="2">
               <Dialog.Trigger>
                 <Button
                   size="3"
@@ -593,7 +606,8 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
                     <Spinner size="2" />
                   ) : feed!.subscriptionId ? (
                     <>
-                      <DownloadIcon style={{ marginRight: '8px' }} /> Download & Decrypt Files
+                      {!hasCache && <DownloadIcon style={{ marginRight: '8px' }} />}
+                      {hasCache ? "View Files" : "Download & Decrypt Files"}
                     </>
                   ) : (
                     <>
@@ -602,6 +616,24 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
                   )}
                 </Button>
               </Dialog.Trigger>
+              {feed!.subscriptionId && hasCache && (
+                <Button
+                  onClick={() => {
+                    localStorage.removeItem(`space_${id}`);
+                    onView(feed!.blobIds, feed!.id, Number(feed!.fee), feed!.subscriptionId)
+                  }}
+                  size="3"
+                  className="water-button-primary">
+                  <DownloadIcon />
+                  {isLoadingAction ? (
+                    <Spinner size="2" />
+                  ) : (
+                    <>
+                      Download & Decrypt Files
+                    </>
+                  )}
+                </Button>
+              )}
             </Flex>
             <Dialog.Content
               style={{
