@@ -156,7 +156,19 @@ const Chatbot = () => {
   const handleDownloadMemory = async () => {
     try {
       setIsDownloading(true);
-      await exportMemory();
+      const exportedHistory = messages.map(message => ({
+        "role": message.isUser ? "user" : "assistant",
+        "content": message.text
+      }));
+      const blob = new Blob([JSON.stringify({ "messages": exportedHistory })], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'memory.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } finally {
       setIsDownloading(false);
     }
@@ -227,11 +239,11 @@ const Chatbot = () => {
         </Text>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <Button loading={isDownloading} onClick={handleDownloadMemory}>
-            Export Memory
+            Download Memory
           </Button>
           <Button loading={isUploading} onClick={() => uplodaMemoryInput.current?.click()}>
             <input ref={uplodaMemoryInput} type='file' accept='.json' onChange={handleUploadMemory} hidden />
-            Import Memory
+            Upload Memory
           </Button>
         </div>
       </Flex>
