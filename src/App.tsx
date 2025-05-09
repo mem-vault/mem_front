@@ -15,6 +15,7 @@ import { OwnedSpaces } from './OwnedSpaces';
 import SubscribedSpaces from './SubscribedSpaces';
 import SpaceInfo from './SpaceInfo';
 import { ManageSpace } from './ManageSpace';
+import { MarkdownMemory } from './MarkdownEditor';
 
 // --- 增强的水波纹背景 ---
 const SubtleWaterBackground = () => (
@@ -411,6 +412,7 @@ function App() {
             </Flex>
           }
         />
+        <Route path='/md' element={<MarkdownMemory />} />
       </Routes>
     </Router>
   );

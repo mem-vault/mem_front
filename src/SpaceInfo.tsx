@@ -74,6 +74,9 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
         if (contentType.includes('application/json')) {
           const data = await response.json();
           setFileData(data);
+        } else if (contentType === 'markdown') {
+          const data = await response.text();
+          setFileData(data);
         } else {
           // 对于其他类型，我们只存储URL
           setFileData(url);
@@ -94,14 +97,20 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
     if (fileType.includes('image/')) return 'image';
     if (fileType.includes('application/json')) return 'json';
     if (fileType.includes('text/')) return 'txt';
+    if (fileType.includes('markdown')) return 'md';
     return 'file'; // 默认扩展名
   };
 
   const extension = getFileExtension();
 
-  const handleChatWithJson = () => {
-    localStorage.setItem('CHAT_DATA', JSON.stringify(fileData));
-    navigate('/chat');
+  const handleUseFile = () => {
+    if (extension === 'json') {
+      localStorage.setItem('CHAT_DATA', JSON.stringify(fileData));
+      navigate('/chat');
+    } else {
+      localStorage.setItem('markdown-content', fileData);
+      navigate('/md');
+    }
   }
 
   return (
@@ -121,7 +130,7 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
                 Download {extension.toUpperCase()}
               </a>
             </Button>
-            {extension === 'json' && (
+            {(extension === 'json' || extension === "md") && (
               <Button
                 size="2"
                 variant="solid"
@@ -132,11 +141,18 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
                   color: 'white',
                 }}
                 className="water-button-primary"
-                onClick={handleChatWithJson}
+                onClick={handleUseFile}
               >
-                <div>
-                  Chat with Memory
-                </div>
+                {extension === 'json' ? (
+                  <div>
+                    Chat with Memory
+                  </div>
+                ) : (extension === "md") ? (
+                  <div>
+                    Edit Markdown
+                  </div>
+                ) : null
+                }
               </Button>
             )}
           </Flex>
@@ -407,16 +423,6 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
     fee: number,
     subscriptionId?: string,
   ) => {
-    const cachedFileList = localStorage.getItem(`space_${id}`);
-    if (cachedFileList) {
-      setIsDialogOpen(true);
-      const data = JSON.parse(cachedFileList);
-      console.log("Cached data:", data);
-      // @ts-ignore
-      setDecryptedFileUrls(data.map((item) => URL.createObjectURL(new Blob([item.data], { type: item.type }))));
-      setIsLoadingAction(false);
-      return;
-    }
     setError(null);
     if (!currentAccount?.address) {
       setError("Please connect your wallet first.");
@@ -436,6 +442,16 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
     setIsDialogOpen(true);
 
     try {
+      const cachedFileList = localStorage.getItem(`space_${id}`);
+      if (cachedFileList) {
+        setIsDialogOpen(true);
+        const data = JSON.parse(cachedFileList);
+        console.log("Cached data:", data);
+        // @ts-ignore
+        setDecryptedFileUrls(data.map((item) => URL.createObjectURL(new Blob([item.data], { type: item.type }))));
+        setIsLoadingAction(false);
+        return;
+      }
       if (
         currentSessionKey &&
         !currentSessionKey.isExpired() &&

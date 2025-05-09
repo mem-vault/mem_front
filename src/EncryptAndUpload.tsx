@@ -144,13 +144,14 @@ export function WalrusUpload({ policyObject, cap_id, moduleName }: WalrusUploadP
         if (event.target && event.target.result) {
           const result = event.target.result;
           if (result instanceof ArrayBuffer) {
+            const isMarkdown = file.name.endsWith('.md');
             const nonce = crypto.getRandomValues(new Uint8Array(5));
             const policyObjectBytes = fromHex(policyObject);
             const id = toHex(new Uint8Array([...policyObjectBytes, ...nonce]));
 
             // 将文件类型与数据一起打包
             const dataWithType = {
-              type: file.type,
+              type: isMarkdown ? "markdown" : file.type,
               content: Array.from(new Uint8Array(result)) // 转换为数组以便JSON序列化
             };
 
