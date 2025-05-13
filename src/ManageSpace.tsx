@@ -7,7 +7,7 @@ import { Card, Flex, Text, Heading, Box, Link as RadixLink, Grid, Button } from 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNetworkVariable } from './networkConfig';
-import { getObjectExplorerLink } from './utils';
+import { openInMarkdownEditor } from './utils';
 import { Link2Icon, InfoCircledIcon } from '@radix-ui/react-icons'; // Import icons
 
 export interface Service {
@@ -161,22 +161,25 @@ export function ManageSpace({ setRecipientAllowlist, setCapId }: AllowlistProps)
                 <Text size="2" weight="medium" style={{ color: accentAqua, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Space Control Panel
                 </Text>
-                <RadixLink href="/chat" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                <Flex gap="2">
+                  <RadixLink href="/chat" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    <Button
+                      size="2"
+                      variant="outline"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      Create Chat
+                    </Button>
+                  </RadixLink>
                   <Button
+                    style={{ cursor: 'pointer' }}
                     size="2"
-                    variant="ghost"
-                    style={{
-                      cursor: 'pointer',
-                      color: primaryText,
-                      fontWeight: 500,
-                      transition: 'color 0.2s ease',
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.color = accentAqua}
-                    onMouseOut={(e) => e.currentTarget.style.color = primaryText}
+                    variant="outline"
+                    onClick={() => openInMarkdownEditor()}
                   >
-                    create memory
+                    Create Markdown
                   </Button>
-                </RadixLink>
+                </Flex>
               </Flex>
               <Heading as="h2" size={{ initial: '6', sm: '7' }} style={{ color: primaryText, fontWeight: 600 }}>
                 {serviceName}

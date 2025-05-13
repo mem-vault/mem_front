@@ -2,6 +2,7 @@ import { SealClient, SessionKey, NoAccessError, EncryptedObject } from '@mysten/
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import React from 'react';
+import { MARKDOWN_CONTENT_KEY } from './constants';
 
 export type MoveCallConstructor = (tx: Transaction, id: string) => void;
 
@@ -138,3 +139,12 @@ export const getObjectExplorerLink = (id: string): React.ReactElement => {
     id.slice(0, 10) + '...',
   );
 };
+
+export const openInMarkdownEditor = (data?: string) => {
+  if (!data) {
+    localStorage.removeItem(MARKDOWN_CONTENT_KEY);
+  } else {
+    localStorage.setItem(MARKDOWN_CONTENT_KEY, data);
+  }
+  window.open("/md", "_blank");
+}

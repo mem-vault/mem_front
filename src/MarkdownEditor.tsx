@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import MDEditor from '@uiw/react-md-editor';
-import { Box, Button, Container, Flex, Text } from "@radix-ui/themes";
+import { Button, Flex, Text } from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
+import { MARKDOWN_CONTENT_KEY } from "./constants";
 
 export const MarkdownMemory = () => {
     const [markdown, setMarkdown] = useState<string | undefined>("**Hello world!!!**");
     const navigate = useNavigate();
+    const importInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        const mdContent = localStorage.getItem("markdown-content");
+        const mdContent = localStorage.getItem(MARKDOWN_CONTENT_KEY);
         if (mdContent) {
             setMarkdown(mdContent);
         }
@@ -23,6 +25,18 @@ export const MarkdownMemory = () => {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+    }
+
+    const handleImportMarkdown = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const text = reader.result as string;
+                setMarkdown(text);
+            };
+            reader.readAsText(file);
+        }
     }
 
     return (
@@ -63,8 +77,17 @@ export const MarkdownMemory = () => {
 
                 <Flex gap="1rem">
                     <Button style={{ cursor: 'pointer' }} onClick={handleDownloadFile}>
-                        Download File
+                        Download Markdown
                     </Button>
+                    <Button style={{ cursor: "pointer" }} onClick={() => importInputRef.current?.click()}>
+                        Upload Markdown
+                    </Button>
+                    <input
+                        ref={importInputRef}
+                        hidden
+                        type="file"
+                        accept=".md"
+                        onChange={handleImportMarkdown} />
                 </Flex>
             </Flex>
 

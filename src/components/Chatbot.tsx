@@ -3,7 +3,7 @@ import { Box, Button, Card, Container, Flex, Text, TextArea } from '@radix-ui/th
 import { useNavigate } from 'react-router-dom';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { Message } from '../chatService';
-import { useMemoryService } from '../memoryService';
+import { openInMarkdownEditor } from '../utils';
 
 const API_BASE_URL = `https://api.brainsdance.com/api`;
 
@@ -18,7 +18,6 @@ const Chatbot = () => {
   const uplodaMemoryInput = useRef<HTMLInputElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const { exportMemory } = useMemoryService();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -297,17 +296,24 @@ const Chatbot = () => {
                     pointerEvents: 'none',
                   }}
                 />
-                <Text
-                  style={{
-                    color: '#e0f7fa',
-                    lineHeight: 1.6,
-                    position: 'relative',
-                    zIndex: 1,
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
-                  {message.text}
-                </Text>
+                <Flex direction='column' gap='2' align={'end'}>
+                  <Text
+                    style={{
+                      color: '#e0f7fa',
+                      lineHeight: 1.6,
+                      position: 'relative',
+                      zIndex: 1,
+                      whiteSpace: 'pre-wrap',
+                    }}
+                  >
+                    {message.text}
+                  </Text>
+                  {!message.isUser && (
+                    <Button onClick={() => openInMarkdownEditor(message.text)}>
+                      Edit Markdown
+                    </Button>
+                  )}
+                </Flex>
               </Card>
             </Flex>
           ))}
