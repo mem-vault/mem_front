@@ -16,6 +16,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { downloadAndDecrypt, MoveCallConstructor } from './utils';
 import { ExternalLinkIcon, GitHubLogoIcon, TwitterLogoIcon, GlobeIcon, InfoCircledIcon, LockClosedIcon, DownloadIcon } from '@radix-ui/react-icons';
 import { SuiTransactionBlockResponse } from '@mysten/sui/client';
+import { MARKDOWN_CONTENT_KEY } from './constants';
 
 const TTL_MIN = 10;
 export interface FeedData {
@@ -108,7 +109,7 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
       localStorage.setItem('CHAT_DATA', JSON.stringify(fileData));
       navigate('/chat');
     } else {
-      localStorage.setItem('markdown-content', fileData);
+      localStorage.setItem(MARKDOWN_CONTENT_KEY, fileData);
       navigate('/md');
     }
   }
