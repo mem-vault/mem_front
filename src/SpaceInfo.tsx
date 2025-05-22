@@ -16,7 +16,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { downloadAndDecrypt, MoveCallConstructor } from './utils';
 import { ExternalLinkIcon, GitHubLogoIcon, TwitterLogoIcon, GlobeIcon, InfoCircledIcon, LockClosedIcon, DownloadIcon } from '@radix-ui/react-icons';
 import { SuiTransactionBlockResponse } from '@mysten/sui/client';
-import { MARKDOWN_CONTENT_KEY } from './constants';
+import { CHAT_HEADER_KEY, MARKDOWN_CONTENT_KEY } from './constants';
 
 const TTL_MIN = 10;
 export interface FeedData {
@@ -69,6 +69,7 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
         }
 
         const contentType = response.headers.get('content-type') || '';
+        console.log('Content-Type:', contentType);
         setFileType(contentType);
 
         // 基于内容类型处理数据
@@ -78,6 +79,9 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
         } else if (contentType === 'markdown') {
           const data = await response.text();
           setFileData(data);
+        } else if (contentType.startsWith('image/')){
+          const bytes = await response.bytes();
+          setFileData(bytes);
         } else {
           // 对于其他类型，我们只存储URL
           setFileData(url);
@@ -105,7 +109,14 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
   const extension = getFileExtension();
 
   const handleUseFile = () => {
-    if (extension === 'json') {
+    if (extension === 'image') {
+      console.log(fileData);
+      localStorage.setItem(CHAT_HEADER_KEY, JSON.stringify({
+        type: fileType,
+        data: toBase64(fileData),
+      }));
+      navigate('/chat');
+    } else if (extension === 'json') {
       localStorage.setItem('CHAT_DATA', JSON.stringify(fileData));
       navigate('/chat');
     } else {
@@ -131,6 +142,20 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
                 Download {extension.toUpperCase()}
               </a>
             </Button>
+            {extension === 'image' && (
+              <Button
+                size="2"
+                variant="soft"
+                asChild
+                style={{ cursor: 'pointer' }}
+                className="water-button-soft"
+                onClick={handleUseFile}
+              >
+                <div>
+                  Chat with Character
+                </div>
+              </Button>
+            )}
             {(extension === 'json' || extension === "md") && (
               <Button
                 size="2"

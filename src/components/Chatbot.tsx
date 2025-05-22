@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { Message } from '../chatService';
 import { openInMarkdownEditor } from '../utils';
+import { fromBase64 } from '@mysten/bcs';
+import { CHAT_HEADER_KEY } from '../constants';
 
 const API_BASE_URL = `https://api.brainsdance.com/api`;
 
@@ -18,6 +20,18 @@ const Chatbot = () => {
   const uplodaMemoryInput = useRef<HTMLInputElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [header, setHeader] = useState<Blob | null>(null);
+
+  useEffect(() => {
+    const loadHeader = () => {
+      const headerData = localStorage.getItem(CHAT_HEADER_KEY);
+      if (headerData) {
+        const { type, data } = JSON.parse(headerData);
+        setHeader(new Blob([fromBase64(data)], { type }));
+      }
+    }
+    loadHeader();
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -265,57 +279,62 @@ const Chatbot = () => {
       >
         <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           {messages.map((message, index) => (
-            <Flex
-              key={index}
-              justify={message.isUser ? 'end' : 'start'}
-              mb="4"
-            >
-              <Card
-                style={{
-                  maxWidth: '70%',
-                  background: message.isUser
-                    ? 'linear-gradient(135deg, rgba(173, 232, 244, 0.2), rgba(144, 224, 239, 0.4))'
-                    : 'linear-gradient(135deg, rgba(144, 224, 239, 0.1), rgba(173, 232, 244, 0.2))',
-                  border: '1px solid rgba(173, 232, 244, 0.5)',
-                  borderRadius: '20px',
-                  padding: '1rem',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-              >
-                <div
+            <>
+              {!message.isUser && (
+                <img src={header ? URL.createObjectURL(header) : ''} alt="Chat Header" style={{
+                  width: '64px',
+                  height: '64px',
+                  marginBottom: '8px',
+                }} />
+              )}
+              <Flex key={index} justify={message.isUser ? 'end' : 'start'} mb="4" gap="2">
+                <Card
                   style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    maxWidth: '70%',
                     background: message.isUser
-                      ? 'radial-gradient(circle at 50% 50%, rgba(173, 232, 244, 0.1) 0%, rgba(255, 255, 255, 0) 70%)'
-                      : 'radial-gradient(circle at 50% 50%, rgba(144, 224, 239, 0.05) 0%, rgba(255, 255, 255, 0) 70%)',
-                    pointerEvents: 'none',
+                      ? 'linear-gradient(135deg, rgba(173, 232, 244, 0.2), rgba(144, 224, 239, 0.4))'
+                      : 'linear-gradient(135deg, rgba(144, 224, 239, 0.1), rgba(173, 232, 244, 0.2))',
+                    border: '1px solid rgba(173, 232, 244, 0.5)',
+                    borderRadius: '20px',
+                    padding: '1rem',
+                    position: 'relative',
+                    overflow: 'hidden',
                   }}
-                />
-                <Flex direction='column' gap='2' align={'end'}>
-                  <Text
+                >
+                  <div
                     style={{
-                      color: '#e0f7fa',
-                      lineHeight: 1.6,
-                      position: 'relative',
-                      zIndex: 1,
-                      whiteSpace: 'pre-wrap',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: message.isUser
+                        ? 'radial-gradient(circle at 50% 50%, rgba(173, 232, 244, 0.1) 0%, rgba(255, 255, 255, 0) 70%)'
+                        : 'radial-gradient(circle at 50% 50%, rgba(144, 224, 239, 0.05) 0%, rgba(255, 255, 255, 0) 70%)',
+                      pointerEvents: 'none',
                     }}
-                  >
-                    {message.text}
-                  </Text>
-                  {!message.isUser && (
-                    <Button onClick={() => openInMarkdownEditor(message.text)}>
-                      Edit Markdown
-                    </Button>
-                  )}
-                </Flex>
-              </Card>
-            </Flex>
+                  />
+                  <Flex direction='column' gap='2' align={'end'}>
+                    <Text
+                      style={{
+                        color: '#e0f7fa',
+                        lineHeight: 1.6,
+                        position: 'relative',
+                        zIndex: 1,
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {message.text}
+                    </Text>
+                    {!message.isUser && (
+                      <Button onClick={() => openInMarkdownEditor(message.text)}>
+                        Edit Markdown
+                      </Button>
+                    )}
+                  </Flex>
+                </Card>
+              </Flex >
+            </>
           ))}
           <div ref={messagesEndRef} />
         </Box>
@@ -375,7 +394,7 @@ const Chatbot = () => {
           </Button>
         </Flex>
       </Box>
-    </Container>
+    </Container >
   );
 };
 

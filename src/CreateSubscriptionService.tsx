@@ -186,7 +186,8 @@ export function CreateService({ onBack }: CreateServiceProps) {
               e.currentTarget.style.boxShadow = '0 4px 10px rgba(0, 172, 193, 0.4)';
             }}
           >
-            <PlusIcon style={{ marginRight: '5px' }} /> Publish Space
+            <PlusIcon style={{ marginRight: '5px' }} />
+            <span>Publish Space</span>
           </Button>
           <Button
             size="3"
