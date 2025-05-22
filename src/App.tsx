@@ -159,7 +159,7 @@ function HomePage() {
         }}
       >
         <Heading as="h1" size="8" style={{ color: '#ade8f4', fontWeight: 'bold' }}>
-          Memory Vault
+          Meme Chat
         </Heading>
         <Flex gap="4" align="center">
           {currentAccount && (
@@ -213,7 +213,7 @@ function HomePage() {
             onClick={() => navigate('/chat')}
           >
             <span style={{ position: 'relative', zIndex: 1 }}>
-              New here? Come try Memory Vault
+              New here? Come try Meme Chat
             </span>
             <div style={{
               position: 'absolute',

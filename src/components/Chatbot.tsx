@@ -6,6 +6,7 @@ import { Message } from '../chatService';
 import { openInMarkdownEditor } from '../utils';
 import { fromBase64 } from '@mysten/bcs';
 import { CHAT_HEADER_KEY } from '../constants';
+import defaultHeader from "./default-header.jpg?url";
 
 const API_BASE_URL = `https://api.brainsdance.com/api`;
 
@@ -23,11 +24,13 @@ const Chatbot = () => {
   const [header, setHeader] = useState<Blob | null>(null);
 
   useEffect(() => {
-    const loadHeader = () => {
+    const loadHeader = async () => {
       const headerData = localStorage.getItem(CHAT_HEADER_KEY);
       if (headerData) {
         const { type, data } = JSON.parse(headerData);
         setHeader(new Blob([fromBase64(data)], { type }));
+      } else {
+        setHeader(await fetch(defaultHeader).then(res => res.blob()));
       }
     }
     loadHeader();
@@ -55,12 +58,12 @@ const Chatbot = () => {
         {
           id: startId + 0,
           isUser: true,
-          text: "Please translate into Chinese: hello we are the builders of memory vault, a decentralized AI memory sharing platform. Creators can interact with chatbots and upload these conversations into their own SPACE. Users can subscribe to those spaces, and continue the conversation with a chatbot."
+          text: "Please translate into Chinese: hello we are the builders of Meme Chat, a decentralized AI memory sharing platform. Creators can interact with chatbots and upload these conversations into their own SPACE. Users can subscribe to those spaces, and continue the conversation with a chatbot."
         },
         {
           id: startId + 1,
           isUser: false,
-          text: "你好，我们是Memory Vault的开发者，这是一个去中心化的AI记忆共享平台。创作者可以与聊天机器人互动，并将这些对话上传到他们专属的SPACE空间中。用户可以订阅这些空间，并继续与聊天机器人展开对话。  \n\n（注：根据技术语境优化了术语翻译——\"SPACE\"保留英文大写强调产品功能模块，\"chatbot\"译为行业通用词\"聊天机器人\"，并采用\"去中心化\"等区块链领域标准译法，确保概念准确性。）"
+          text: "你好，我们是Meme Chat的开发者，这是一个去中心化的AI记忆共享平台。创作者可以与聊天机器人互动，并将这些对话上传到他们专属的SPACE空间中。用户可以订阅这些空间，并继续与聊天机器人展开对话。  \n\n（注：根据技术语境优化了术语翻译——\"SPACE\"保留英文大写强调产品功能模块，\"chatbot\"译为行业通用词\"聊天机器人\"，并采用\"去中心化\"等区块链领域标准译法，确保概念准确性。）"
         }
       ]);
     }
@@ -245,10 +248,10 @@ const Chatbot = () => {
           onClick={() => navigate('/')}
           style={{ color: '#ade8f4' }}
         >
-          返回主页
+          Back to Home
         </Button>
         <Text size="5" weight="bold" style={{ color: '#ade8f4' }}>
-          Memory Orb AI
+          Meme Chat AI
         </Text>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <Button loading={isDownloading} onClick={handleDownloadMemory}>
@@ -279,7 +282,7 @@ const Chatbot = () => {
       >
         <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           {messages.map((message, index) => (
-            <>
+            <div key={index}>
               {!message.isUser && header && (
                 <img src={URL.createObjectURL(header)} alt="Chat Header" style={{
                   width: '64px',
@@ -287,7 +290,7 @@ const Chatbot = () => {
                   marginBottom: '8px',
                 }} />
               )}
-              <Flex key={index} justify={message.isUser ? 'end' : 'start'} mb="4" gap="2">
+              <Flex justify={message.isUser ? 'end' : 'start'} mb="4" gap="2">
                 <Card
                   style={{
                     maxWidth: '70%',
@@ -334,7 +337,7 @@ const Chatbot = () => {
                   </Flex>
                 </Card>
               </Flex >
-            </>
+            </div>
           ))}
           <div ref={messagesEndRef} />
         </Box>

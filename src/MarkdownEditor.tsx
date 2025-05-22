@@ -69,10 +69,10 @@ export const MarkdownMemory = () => {
                     onClick={() => navigate('/')}
                     style={{ color: '#ade8f4' }}
                 >
-                    Back to Homepage
+                    Back to Home
                 </Button>
                 <Text size="5" weight="bold" style={{ color: '#ade8f4' }}>
-                    Memory Orb AI
+                    Meme Chat AI
                 </Text>
 
                 <Flex gap="1rem">
