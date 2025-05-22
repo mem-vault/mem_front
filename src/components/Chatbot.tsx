@@ -280,8 +280,8 @@ const Chatbot = () => {
         <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           {messages.map((message, index) => (
             <>
-              {!message.isUser && (
-                <img src={header ? URL.createObjectURL(header) : ''} alt="Chat Header" style={{
+              {!message.isUser && header && (
+                <img src={URL.createObjectURL(header)} alt="Chat Header" style={{
                   width: '64px',
                   height: '64px',
                   marginBottom: '8px',
