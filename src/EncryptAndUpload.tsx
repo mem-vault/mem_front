@@ -142,8 +142,8 @@ export function WalrusUpload({ policyObject, cap_id, moduleName }: WalrusUploadP
       const reader = new FileReader();
       reader.onload = async function (event) {
         if (event.target && event.target.result) {
-          const result = event.target.result;
-          if (result instanceof ArrayBuffer) {
+          const { result: fileContent } = event.target;
+          if (fileContent instanceof ArrayBuffer) {
             const isMarkdown = file.name.endsWith('.md');
             const nonce = crypto.getRandomValues(new Uint8Array(5));
             const policyObjectBytes = fromHex(policyObject);
@@ -151,25 +151,27 @@ export function WalrusUpload({ policyObject, cap_id, moduleName }: WalrusUploadP
 
             // 将文件类型与数据一起打包
             const dataWithType = {
-              type: isMarkdown ? "markdown" : file.type,
-              content: Array.from(new Uint8Array(result)) // 转换为数组以便JSON序列化
+              type: isMarkdown ? "text/markdown" : file.type,
+              content: Array.from(new Uint8Array(fileContent)) // 转换为数组以便JSON序列化
             };
 
             // 序列化数据包
             const serializedData = JSON.stringify(dataWithType);
+            const data = new TextEncoder().encode(serializedData);
 
             const { encryptedObject: encryptedBytes } = await client.encrypt({
               threshold: 2,
               packageId,
               id,
-              data: new TextEncoder().encode(serializedData), // 加密序列化后的数据
+              data, // 加密序列化后的数据
             });
 
             const storageInfo = await storeBlob(encryptedBytes);
+            console.log('Storage info:', storageInfo);
             displayUpload(storageInfo.info, file.type);
             setIsUploading(false);
           } else {
-            console.error('Unexpected result type:', typeof result);
+            console.error('Unexpected result type:', typeof fileContent);
             setIsUploading(false);
           }
         }
@@ -212,24 +214,24 @@ export function WalrusUpload({ policyObject, cap_id, moduleName }: WalrusUploadP
     setInfo(info);
   };
 
-  const storeBlob = (encryptedData: Uint8Array) => {
-    return fetch(`${getPublisherUrl(`/v1/blobs?epochs=${NUM_EPOCH}`)}`, {
+  const storeBlob = async (encryptedData: Uint8Array) => {
+    const response = await fetch(`${getPublisherUrl(`/v1/blobs?epochs=${NUM_EPOCH}`)}`, {
       method: 'PUT',
       body: encryptedData,
-    }).then((response) => {
-      if (response.status === 200) {
-        return response.json().then((info) => {
-          return { info };
-        });
-      } else {
-        alert('Error publishing the blob on Walrus, please select a different Walrus service.');
-        setIsUploading(false);
-        throw new Error('Something went wrong when storing the blob!');
-      }
     });
+    if (response.status === 200) {
+      return response.json().then((info) => {
+        return { info };
+      });
+    } else {
+      alert('Error publishing the blob on Walrus, please select a different Walrus service.');
+      setIsUploading(false);
+      throw new Error('Something went wrong when storing the blob!');
+    }
   };
 
   async function handlePublish(wl_id: string, cap_id: string, moduleName: string) {
+    console.log("Publishing with ID:", wl_id, "and cap_id:", cap_id, "moduleName:", moduleName);
     const tx = new Transaction();
     tx.moveCall({
       target: `${packageId}::${moduleName}::publish`,

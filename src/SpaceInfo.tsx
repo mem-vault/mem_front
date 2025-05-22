@@ -10,7 +10,7 @@ import {
 import { useNetworkVariable } from './networkConfig';
 import { AlertDialog, Button, Card, Dialog, Flex, Grid, Heading, Text, Box, Link as RadixLink, Separator, Spinner } from '@radix-ui/themes';
 import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
-import { fromHex, SUI_CLOCK_OBJECT_ID } from '@mysten/sui/utils';
+import { fromBase64, fromHex, SUI_CLOCK_OBJECT_ID, toBase64 } from '@mysten/sui/utils';
 import { SealClient, SessionKey, getAllowlistedKeyServers } from '@mysten/seal';
 import { useParams, useNavigate } from 'react-router-dom';
 import { downloadAndDecrypt, MoveCallConstructor } from './utils';
@@ -221,8 +221,9 @@ const FileDisplay: React.FC<{ url: string; index: number }> = ({ url, index }) =
   );
 };
 
-const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
+const SpaceInfo: React.FC<{}> = () => {
   const suiClient = useSuiClient();
+  const currentAccount = useCurrentAccount();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -235,7 +236,6 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
   const [decryptedFileUrls, setDecryptedFileUrls] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const packageId = useNetworkVariable('packageId');
-  const currentAccount = useCurrentAccount();
   const [currentSessionKey, setCurrentSessionKey] = useState<SessionKey | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [hasCache, setHasCache] = useState(false);
@@ -261,7 +261,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
       getFeed();
     }, 3000);
     return () => clearInterval(intervalId);
-  }, [id, suiAddress, packageId, suiClient]);
+  }, [id, currentAccount, packageId, suiClient]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -277,6 +277,9 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
 
   async function getFeed() {
     try {
+      if (!currentAccount) {
+        return;
+      }
       const encryptedObjects = await suiClient
         .getDynamicFields({
           parentId: id!,
@@ -290,7 +293,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
       const service_fields = (service.data?.content as { fields: any })?.fields || {};
 
       const res = await suiClient.getOwnedObjects({
-        owner: suiAddress,
+        owner: currentAccount?.address,
         options: {
           showContent: true,
           showType: true,
@@ -412,8 +415,11 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
     }
   }
 
-  const updateDecryptedData = (data: { type: string, data: string }[]) => {
-    localStorage.setItem(`space_${id}`, JSON.stringify(data));
+  const updateDecryptedData = (data: { type: string, data: Uint8Array }[]) => {
+    localStorage.setItem(`space_${id}`, JSON.stringify(data.map((item) => ({
+      type: item.type,
+      data: toBase64(item.data),
+    }))));
     const urls = data.map((item) => URL.createObjectURL(new Blob([item.data], { type: item.type })));
     setDecryptedFileUrls(urls);
   }
@@ -449,14 +455,14 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
         const data = JSON.parse(cachedFileList);
         console.log("Cached data:", data);
         // @ts-ignore
-        setDecryptedFileUrls(data.map((item) => URL.createObjectURL(new Blob([item.data], { type: item.type }))));
+        setDecryptedFileUrls(data.map((item) => URL.createObjectURL(new Blob([fromBase64(item.data)], { type: item.type }))));
         setIsLoadingAction(false);
         return;
       }
       if (
         currentSessionKey &&
         !currentSessionKey.isExpired() &&
-        currentSessionKey.getAddress() === suiAddress
+        currentSessionKey.getAddress() === currentAccount.address
       ) {
         const moveCallConstructor = constructMoveCall(packageId, serviceId, subscriptionId);
         await downloadAndDecrypt(
@@ -473,7 +479,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
       } else {
         setCurrentSessionKey(null);
         const sessionKey = new SessionKey({
-          address: suiAddress,
+          address: currentAccount.address,
           packageId,
           ttlMin: TTL_MIN,
         });
@@ -518,7 +524,7 @@ const SpaceInfo: React.FC<{ suiAddress: string }> = ({ suiAddress }) => {
       setError(`An unexpected error occurred: ${error.message || error}`);
       setIsDialogOpen(false);
     } finally {
-      if (!(currentSessionKey && !currentSessionKey.isExpired() && currentSessionKey.getAddress() === suiAddress)) {
+      if (!(currentSessionKey && !currentSessionKey.isExpired() && currentSessionKey.getAddress() === currentAccount.address)) {
       } else {
         setIsLoadingAction(false);
       }

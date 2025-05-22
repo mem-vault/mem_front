@@ -180,9 +180,9 @@ function HomePage() {
 
       <Box p={{ initial: '4', md: '5' }}>
         {/* Experience Button */}
-        <Box style={{ 
-          maxWidth: '1200px', 
-          margin: '50px auto 50px auto', 
+        <Box style={{
+          maxWidth: '1200px',
+          margin: '50px auto 50px auto',
           textAlign: 'center',
           position: 'relative',
         }}>
@@ -232,10 +232,10 @@ function HomePage() {
         {!showCreateService ? (
           <Grid columns="2" gap="5" style={{ maxWidth: '1200px', margin: '4rem auto 2rem auto' }}>
             {/* Left: Launch Your Creative Space */}
-            <Card style={{ 
-              background: 'rgba(255, 255, 255, 0.8)', 
-              backdropFilter: 'blur(10px)', 
-              borderRadius: '32px', 
+            <Card style={{
+              background: 'rgba(255, 255, 255, 0.8)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '32px',
               boxShadow: '0 8px 32px rgba(144, 224, 239, 0.3)',
               border: '1px solid rgba(173, 232, 244, 0.5)',
               position: 'relative',
@@ -259,15 +259,15 @@ function HomePage() {
                     Create exclusive content and unique experiences for your loyal fans. Easily set up membership plans, share your work, and build deep connections with your core supporters.
                   </Text>
                 </div>
-                <Button 
-                  size="4" 
-                  radius="full" 
+                <Button
+                  size="4"
+                  radius="full"
                   onClick={() => setShowCreateService(true)}
-                  style={{ 
-                    background: 'linear-gradient(to right, #0077b6, #00b4d8)', 
-                    color: 'white', 
-                    padding: '1rem 2.5rem', 
-                    fontWeight: '600', 
+                  style={{
+                    background: 'linear-gradient(to right, #0077b6, #00b4d8)',
+                    color: 'white',
+                    padding: '1rem 2.5rem',
+                    fontWeight: '600',
                     boxShadow: '0 4px 15px rgba(0, 119, 182, 0.3)',
                     borderRadius: '24px',
                   }}
@@ -278,10 +278,10 @@ function HomePage() {
             </Card>
 
             {/* Right: Explore Others' Spaces */}
-            <Card style={{ 
-              background: 'rgba(255, 255, 255, 0.8)', 
-              backdropFilter: 'blur(10px)', 
-              borderRadius: '32px', 
+            <Card style={{
+              background: 'rgba(255, 255, 255, 0.8)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '32px',
               boxShadow: '0 8px 32px rgba(144, 224, 239, 0.3)',
               border: '1px solid rgba(173, 232, 244, 0.5)',
               position: 'relative',
@@ -305,15 +305,15 @@ function HomePage() {
                     Discover like-minded creators and explore their amazing worlds. Here, you can find resonance and grow with friends who share your interests.
                   </Text>
                 </div>
-                <Button 
-                  size="4" 
-                  radius="full" 
+                <Button
+                  size="4"
+                  radius="full"
                   onClick={() => window.scrollTo({ top: document.getElementById('creators')?.offsetTop, behavior: 'smooth' })}
-                  style={{ 
-                    background: 'linear-gradient(to right, #0077b6, #00b4d8)', 
-                    color: 'white', 
-                    padding: '1rem 2.5rem', 
-                    fontWeight: '600', 
+                  style={{
+                    background: 'linear-gradient(to right, #0077b6, #00b4d8)',
+                    color: 'white',
+                    padding: '1rem 2.5rem',
+                    fontWeight: '600',
                     boxShadow: '0 4px 15px rgba(0, 119, 182, 0.3)',
                     borderRadius: '24px',
                   }}
@@ -326,18 +326,18 @@ function HomePage() {
         ) : (
           <CreateService onBack={() => setShowCreateService(false)} />
         )}
-        
+
         {/* Wave Separator */}
         <WaveSeparator />
-        
+
         {/* Second Screen: Discover Hidden Gem Creators */}
         <Box id="creators">
           <ScrollingCreators />
         </Box>
-        
+
         {/* Wave Separator */}
         <WaveSeparator />
-        
+
         {/* Third Screen: Platform Guide */}
         <Card id="guide" style={{ marginBottom: '3rem', background: 'rgba(230, 249, 253, 0.8)', borderRadius: '16px', backdropFilter: 'blur(8px)', border: '1px solid rgba(173, 232, 244, 0.7)', boxShadow: '0 6px 24px rgba(173, 232, 244, 0.2)' }}>
           <Box p="5">
@@ -393,9 +393,7 @@ function App() {
         <Route path="/chat" element={<Chatbot />} />
         <Route path="/myspaces" element={<OwnedSpaces />} />
         <Route path="/mysubscriptions" element={<SubscribedSpaces />} />
-        {currentAccount && (
-          <Route path="/view/space/:id" element={<SpaceInfo suiAddress={currentAccount.address} />} />
-        )}
+        <Route path="/view/space/:id" element={<SpaceInfo />} />
         <Route
           path="/admin/space/:id"
           element={
