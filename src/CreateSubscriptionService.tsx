@@ -37,7 +37,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
     const maxSubscribersNum = parseInt(maxSubscribers) || 0;
 
     if (!price || price <= 0 || !ttl || ttl <= 0 || name === '') {
-      alert('请确保名称、价格和时长都已正确填写，价格和时长必须大于 0。');
+      alert('Please ensure that the name, price, and duration are correctly filled in, and that the price and duration are greater than 0.');
       return;
     }
 
@@ -62,12 +62,12 @@ export function CreateService({ onBack }: CreateServiceProps) {
           if (createdObjectId) {
             navigate(`/admin/space/${createdObjectId}`);
           } else {
-            alert('创建失败，无法找到创建的对象 ID。');
+            alert('Creation failed, could not find the created object ID.');
           }
         },
         onError: (error) => {
-          console.error("创建服务失败:", error);
-          alert(`创建服务时出错: ${error.message || '未知错误'}`);
+          console.error("Failed to create service:", error);
+          alert(`Error creating service: ${error.message || 'Unknown error'}`);
         }
       },
     );
@@ -92,14 +92,14 @@ export function CreateService({ onBack }: CreateServiceProps) {
       overflow: 'hidden',
     }}>
       <Flex direction="column" gap="4" p="4">
-        <Heading size="5" style={{ color: '#004d40', textAlign: 'center' }}>创建新的会员空间</Heading>
+        <Heading size="5" style={{ color: '#004d40', textAlign: 'center' }}>Create New Member Space</Heading>
 
         <label>
           <Text as="div" size="3" weight="medium" mb="1" color="teal" style={{ color: '#006064' }}>
-            空间名称
+            Space Name
           </Text>
           <TextField.Root
-            placeholder="例如：基础支持者、核心粉丝"
+            placeholder="e.g., Basic Supporters, Core Fans"
             value={name}
             onChange={(e) => setName(e.target.value)}
             size="3"
@@ -115,11 +115,11 @@ export function CreateService({ onBack }: CreateServiceProps) {
 
         <label>
           <Text as="div" size="3" weight="medium" mb="1" color="teal" style={{ color: '#006064' }}>
-            订阅费（MIST）
+            Subscription Fee (MIST)
           </Text>
           <TextField.Root
             type="number"
-            placeholder="例如：500"
+            placeholder="e.g., 500"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             size="3"
@@ -135,11 +135,11 @@ export function CreateService({ onBack }: CreateServiceProps) {
 
         <label>
           <Text as="div" size="3" weight="medium" mb="1" color="teal" style={{ color: '#006064' }}>
-            有效期（分钟）
+            Validity Period (minutes)
           </Text>
           <TextField.Root
             type="number"
-            placeholder="例如：43200 (30天)"
+            placeholder="e.g., 43200 (30 days)"
             value={ttl}
             onChange={(e) => setTtl(e.target.value)}
             size="3"
@@ -153,7 +153,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
           />
           <Text as="div" size="2" color="gray" mt="2" style={{ color: '#00796b' }}>
             <InfoCircledIcon style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-            将作为流动性数量，流动性数量将用于计算用户的订阅费用。
+            This will be used as the liquidity amount, which will be used to calculate the user's subscription fee.
           </Text>
         </label>
 
@@ -186,7 +186,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
               e.currentTarget.style.boxShadow = '0 4px 10px rgba(0, 172, 193, 0.4)';
             }}
           >
-            <PlusIcon style={{ marginRight: '5px' }} /> 发布空间
+            <PlusIcon style={{ marginRight: '5px' }} /> Publish Space
           </Button>
           <Button
             size="3"
@@ -208,7 +208,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
               e.currentTarget.style.backgroundColor = 'transparent';
             }}
           >
-            查看您发布的所有空间
+            View all spaces you published
           </Button>
         </Flex>
 
@@ -225,7 +225,7 @@ export function CreateService({ onBack }: CreateServiceProps) {
               gap: '4px',
             }}
           >
-            <ArrowLeftIcon width={16} height={16} /> 返回
+            <ArrowLeftIcon width={16} height={16} /> Back
           </Button>
         </Flex>
       </Flex>

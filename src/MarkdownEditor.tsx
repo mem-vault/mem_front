@@ -69,7 +69,7 @@ export const MarkdownMemory = () => {
                     onClick={() => navigate('/')}
                     style={{ color: '#ade8f4' }}
                 >
-                    返回主页
+                    Back to Homepage
                 </Button>
                 <Text size="5" weight="bold" style={{ color: '#ade8f4' }}>
                     Memory Orb AI

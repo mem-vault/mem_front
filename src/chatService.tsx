@@ -65,7 +65,6 @@ export const ChatServiceProvider = ({ children }: { children: React.ReactNode })
                 throw new Error(`Chat request failed: ${response.statusText}`);
             }
 
-            // 处理服务器发送的事件流
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
 
