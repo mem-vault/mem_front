@@ -254,6 +254,9 @@ const Chatbot = () => {
           Meme Chat AI
         </Text>
         <div style={{ display: 'flex', gap: '1rem' }}>
+          <Button onClick={() => { localStorage.removeItem('CHAT_DATA'); setMessages([]); }}>
+            Clear Chat
+          </Button>
           <Button loading={isDownloading} onClick={handleDownloadMemory}>
             Download Memory
           </Button>
