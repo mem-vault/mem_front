@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { ConnectButton, useCurrentAccount } from '@mysten/dapp-kit';
-import { Box, Button, Card, Container, Flex, Grid, Heading, Text, Avatar } from '@radix-ui/themes';
+import { Box, Button, Card, Container, Flex, Grid, Heading, Text } from '@radix-ui/themes';
 import WalrusUpload from './EncryptAndUpload';
 import { useState } from 'react';
 import { CreateService } from './CreateSubscriptionService';
@@ -16,6 +16,7 @@ import SubscribedSpaces from './SubscribedSpaces';
 import SpaceInfo from './SpaceInfo';
 import { ManageSpace } from './ManageSpace';
 import { MarkdownMemory } from './MarkdownEditor';
+import { ScrollingCreators } from './components/ScrollingCreators';
 
 // --- Enhanced Subtle Water Background ---
 const SubtleWaterBackground = () => (
@@ -69,66 +70,6 @@ function LandingPage() {
   );
 }
 
-// --- Optimized Scrolling Creators List ---
-const ScrollingCreators = () => {
-  const creators = [
-    { name: 'Bitcoin Benjamin', avatar: 'B', id: '0x00b2495338f87e9867607be53ab1045183b2debca9ca40ed236090e8ff606544' },
-    { name: 'Mem-Vault Guide', avatar: 'M', id: '0x0f152aebec254d92997e24c33c136e73b267fa98eca72ba4736a4e26b058199d' },
-    { name: 'Buffett', avatar: 'B', id: '0x31c42e36052e6a541be56419b21311e5cdc3e2cb049b316e0462044f585e2961' },
-    { name: 'Star Wars', avatar: 'X', id: '0xf1547afad2f071031a562cea4844e39e149cbc77654db05c1bbe2438fe576bbc' },
-    { name: 'AI Classroom', avatar: 'A', id: '0x1c70f6729d2191f0e2e2b75132403326bc2d50c87e1ce88315e6c81453ccbb9e' },
-    { name: 'Tuo Universe', avatar: 'T', id: '0xed5e5248ff9631dd089217a7bf8452c24b27763c833676356699322726a8ef6b' },
-    { name: 'CryptoXian', avatar: 'B', id: '0x6e622dde02687c4915c63925125bec803ffd6fa24ae3496bf4aa285f2fd6ae5d' },
-    { name: 'Bonnie Blockchain', avatar: 'B', id: '0x2aff9822b593f6bb8f464f5aae6df9964766d7ca17d9bdb061c49d49f0b7d7cf' },
-  ];
-
-  return (
-    <Box mt="8" style={{ overflow: 'hidden', background: 'linear-gradient(to right, rgba(207, 249, 255, 0.7), rgba(224, 247, 250, 0.9))', padding: '2rem 0', borderRadius: '16px', backdropFilter: 'blur(5px)' }}>
-      <Heading size="6" align="center" mb="5" style={{ color: '#014f86', fontWeight: 'bold' }}>Discover Hidden Gem Creators</Heading>
-      <div className="scrolling-wrapper">
-        <Flex gap="6" align="center" className="scrolling-content" pl="5" pr="5">
-          {creators.map((creator, index) => (
-            <Link
-              key={index}
-              to={`/view/space/${creator.id}`}
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <Flex
-                direction="column"
-                align="center"
-                gap="2"
-                style={{
-                  minWidth: '120px',
-                  padding: '1rem',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  borderRadius: '12px',
-                  boxShadow: '0 4px 10px rgba(0, 121, 107, 0.1)',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                  cursor: 'pointer',
-                }}
-                onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 7px 15px rgba(0, 121, 107, 0.15)'; }}
-                onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 10px rgba(0, 121, 107, 0.1)'; }}
-              >
-                <Avatar
-                  size="4"
-                  fallback={creator.avatar}
-                  radius="full"
-                  style={{
-                    background: 'linear-gradient(135deg, #00b4d8, #0077b6)',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    boxShadow: '0 2px 8px rgba(0, 180, 216, 0.4)'
-                  }}
-                />
-                <Text size="2" weight="medium" style={{ color: '#006064', textAlign: 'center' }}>{creator.name}</Text>
-              </Flex>
-            </Link>
-          ))}
-        </Flex>
-      </div>
-    </Box>
-  );
-};
 
 // --- Main Page Content Component ---
 function HomePage() {
